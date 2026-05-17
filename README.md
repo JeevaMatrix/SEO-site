@@ -38,7 +38,7 @@ npm install
 npm install @astrojs/tailwind @astrojs/sitemap @astrojs/mdx
 
 # Python deps (for automation scripts)
-pip install anthropic supabase requests
+pip install google-generativeai supabase requests
 
 # Dev server to preview locally
 npm run dev   # → http://localhost:4321
@@ -55,8 +55,7 @@ Do these in parallel (open all in separate tabs):
 | GitHub | github.com | Code + Actions runner (free) |
 | Vercel | vercel.com | Hosting (100GB free) |
 | Supabase | supabase.com | Database (500MB free) |
-| Anthropic | console.anthropic.com | $5 free AI credits |
-| OpenAI | platform.openai.com | $5 free AI credits |
+| Google AI Studio | aistudio.google.com | Generous free tier (1,500 req/day free) |
 | Serper.dev | serper.dev | 2,500 free SERP searches/mo |
 | Unsplash | unsplash.com/developers | Free image API |
 | Google Search Console | search.google.com/search-console | Free indexing |
@@ -136,8 +135,7 @@ In your GitHub repo → Settings → Secrets and variables → Actions → New r
 
 | Secret name | Value |
 |-------------|-------|
-| `ANTHROPIC_API_KEY` | From console.anthropic.com |
-| `OPENAI_API_KEY` | From platform.openai.com |
+| `GEMINI_API_KEY` | From aistudio.google.com |
 | `SUPABASE_URL` | From Supabase Settings > API |
 | `SUPABASE_KEY` | Supabase "anon public" key |
 | `SERPER_API_KEY` | From serper.dev dashboard |
@@ -173,7 +171,7 @@ git push origin main
 ```bash
 # Set env vars locally
 export SERPER_API_KEY="your-key"
-export ANTHROPIC_API_KEY="your-key"
+export GEMINI_API_KEY="your-key"
 export SUPABASE_URL="your-url"
 export SUPABASE_KEY="your-key"
 
@@ -222,11 +220,11 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - run: pip install anthropic supabase requests
+      - run: pip install google-generativeai supabase requests
       - name: Run keyword research
         env:
           SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: python scripts/keyword_research.py
@@ -249,13 +247,13 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - run: pip install anthropic supabase requests
+      - run: pip install google-generativeai supabase requests
       - run: |
           git config user.email "bot@yoursite.com"
           git config user.name "ContentBot"
       - name: Generate content
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           UNSPLASH_KEY: ${{ secrets.UNSPLASH_KEY }}
@@ -281,7 +279,7 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - run: pip install anthropic supabase requests
+      - run: pip install google-generativeai supabase requests
       - run: |
           git config user.email "bot@yoursite.com"
           git config user.name "SEOBot"
@@ -335,8 +333,7 @@ If everything is green: close laptop. System is running itself.
 | Vercel hosting | $0 | 100GB bandwidth free |
 | Supabase | $0 | 500MB storage free |
 | Cloudflare CDN | $0 | Free plan covers everything |
-| Anthropic API | $0* | $5 free credit = ~500 articles |
-| OpenAI API | $0* | $5 free credit = ~1000 articles |
+| Google Gemini API | $0 | Generous free tier (1,500 req/day free) |
 | Serper.dev | $0 | 2,500 searches/mo free |
 | Unsplash API | $0 | Unlimited free |
 | Google Analytics | $0 | Free |

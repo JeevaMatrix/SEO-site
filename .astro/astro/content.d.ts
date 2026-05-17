@@ -152,9 +152,30 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"blog": {
+"best-zapier-alternatives-for-freelancers.md": {
+	id: "best-zapier-alternatives-for-freelancers.md";
+  slug: "best-zapier-alternatives-for-freelancers";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
 "first-post.md": {
 	id: "first-post.md";
   slug: "first-post";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"n8n-vs-zapier-for-marketing-automation.md": {
+	id: "n8n-vs-zapier-for-marketing-automation.md";
+  slug: "n8n-vs-zapier-for-marketing-automation";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"zapier-alternatives-for-small-business-owners.md": {
+	id: "zapier-alternatives-for-small-business-owners.md";
+  slug: "zapier-alternatives-for-small-business-owners";
   body: string;
   collection: "blog";
   data: InferEntrySchema<"blog">

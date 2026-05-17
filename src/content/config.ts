@@ -9,11 +9,12 @@ const blog = defineCollection({
   schema: z.object({
     title: z.string().max(70, 'Title too long for SEO (max 70 chars)'),
     description: z.string()
-      .min(100, 'Description too short (min 100 chars)')
-      .max(160, 'Description too long for SEO (max 160 chars)'),
+      .min(50, 'Description too short (min 50 chars)')
+      .max(200, 'Description too long (max 200 chars)'),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
-    image: z.string().url().optional(),
+    // Allow relative paths as well as URLs
+    image: z.string().optional(),
     tags: z.array(z.string()).default([]),
     affiliate: z.string().optional().default(''),
     draft: z.boolean().optional().default(false),

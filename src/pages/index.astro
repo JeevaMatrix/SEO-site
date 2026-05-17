@@ -1,0 +1,309 @@
+---
+// src/pages/index.astro
+// Homepage — shows latest articles + niche overview.
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
+  .slice(0, 12);
+
+const SITE_NAME = import.meta.env.SITE_NAME || 'AI Tools Guide';
+const SITE_DESC = 'Honest reviews and comparisons of AI tools for small business owners and freelancers.';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{SITE_NAME} — AI Tools for Small Business</title>
+  <meta name="description" content={SITE_DESC} />
+  <meta name="robots" content="index, follow" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXX');
+  </script>
+
+  <style>
+    :root {
+      --accent: #0f6e56;
+      --accent-light: #e1f5ee;
+      --text: #1a1a1a;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --bg: #ffffff;
+      --card-bg: #f9fafb;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #f0f0f0;
+        --text-muted: #9ca3af;
+        --border: #374151;
+        --bg: #111827;
+        --card-bg: #1f2937;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+    .header {
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin-left: 1.5rem;
+    }
+    .hero {
+      max-width: 900px;
+      margin: 4rem auto 3rem;
+      padding: 0 1.5rem;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin: 0 auto 2rem;
+    }
+    .badge {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .articles-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+    .article-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s, transform 0.1s;
+      display: flex;
+      flex-direction: column;
+    }
+    .article-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .card-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+    }
+    .card-body {
+      padding: 1rem 1.25rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-tags {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .card-tag {
+      font-size: 0.72rem;
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.35;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      flex: 1;
+      line-height: 1.5;
+    }
+    .card-date {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+    }
+    .section-title {
+      max-width: 1100px;
+      margin: 0 auto 1rem;
+      padding: 0 1.5rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .email-section {
+      background: var(--accent-light);
+      padding: 3rem 1.5rem;
+      text-align: center;
+      margin: 2rem 0;
+    }
+    .email-section h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .email-section p { color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.95rem; }
+    .email-form {
+      display: flex;
+      gap: 0.5rem;
+      max-width: 420px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .email-form input {
+      flex: 1;
+      min-width: 200px;
+      padding: 0.65rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      background: white;
+    }
+    .email-form button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.65rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 1.75rem; }
+      .articles-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a href="/" class="logo">{SITE_NAME}</a>
+    <nav class="nav">
+      <a href="/blog">All reviews</a>
+      <a href="/best-ai-tools">Top picks</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="badge">Updated weekly</div>
+    <h1>Find the Best AI Tools for Your Small Business</h1>
+    <p>Honest, in-depth reviews and comparisons of automation and AI tools — so you don't waste money on the wrong software.</p>
+  </section>
+
+  <div class="section-title">Latest reviews &amp; comparisons</div>
+
+  <div class="articles-grid">
+    {posts.map(post => (
+      <a class="article-card" href={`/blog/${post.slug}`}>
+        {post.data.image && (
+          <img
+            class="card-img"
+            src={post.data.image}
+            alt={post.data.title}
+            loading="lazy"
+          />
+        )}
+        <div class="card-body">
+          {post.data.tags && post.data.tags.length > 0 && (
+            <div class="card-tags">
+              {post.data.tags.slice(0, 2).map(tag => (
+                <span class="card-tag">{tag}</span>
+              ))}
+            </div>
+          )}
+          <div class="card-title">{post.data.title}</div>
+          <div class="card-desc">{post.data.description?.slice(0, 100)}...</div>
+          <div class="card-date">
+            {new Date(post.data.pubDate).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}
+          </div>
+        </div>
+      </a>
+    ))}
+  </div>
+
+  <!-- Email capture — connects to Brevo (free up to 300 emails/day) -->
+  <section class="email-section">
+    <h2>Get the weekly AI tools digest</h2>
+    <p>New tool reviews, best deals, and automation tips — straight to your inbox. Free.</p>
+    <form
+      class="email-form"
+      action="https://app.brevo.com/api/sendinblue/v3/contacts"
+      method="POST"
+      id="email-form"
+    >
+      <input type="email" name="email" placeholder="your@email.com" required />
+      <button type="submit">Subscribe free</button>
+    </form>
+    <script>
+      // Replace with your Brevo embed form ID for proper handling
+      document.getElementById('email-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = this.querySelector('input[type=email]').value;
+        // Point to your Brevo list form URL
+        window.location.href = `https://your-brevo-form-url.com?email=${encodeURIComponent(email)}`;
+      });
+    </script>
+  </section>
+
+  <footer class="footer">
+    <p>
+      {SITE_NAME} — Honest reviews for small business owners.
+      <br />
+      <a href="/privacy">Privacy</a> · <a href="/affiliate-disclosure">Affiliate disclosure</a> · <a href="/contact">Contact</a>
+    </p>
+  </footer>
+</body>
+</html>

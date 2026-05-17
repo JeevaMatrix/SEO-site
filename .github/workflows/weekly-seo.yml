@@ -1,0 +1,40 @@
+name: Weekly SEO maintenance
+on:
+  schedule:
+    - cron: '0 9 * * 0'
+  workflow_dispatch:
+jobs:
+  seo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install anthropic supabase requests
+      - run: |
+          git config user.email "bot@yoursite.com"
+          git config user.name "SEOBot"
+      - name: Check rankings
+        env:
+          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: python scripts/rank_tracker.py
+      - name: Add internal links
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: python scripts/internal_linker.py
+      - name: Validate affiliates
+        run: python scripts/affiliate_validator.py
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seo-reports
+          path: |
+            rank_report.txt
+            affiliate_report.json

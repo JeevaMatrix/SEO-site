@@ -1,0 +1,28 @@
+name: Daily content generator
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install anthropic supabase requests
+      - run: |
+          git config user.email "bot@yoursite.com"
+          git config user.name "ContentBot"
+      - name: Generate content
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          UNSPLASH_KEY: ${{ secrets.UNSPLASH_KEY }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+          ARTICLES_PER_RUN: "5"
+        run: python scripts/content_generator.py

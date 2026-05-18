@@ -1,0 +1,259 @@
+---
+// src/pages/blog/index.astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = allPosts
+  .sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf());
+
+// Collect all unique tags
+const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))].sort();
+
+function getCategoryFallback(tags = []) {
+  const t = tags.join(' ').toLowerCase();
+  if (t.includes('automation') || t.includes('zapier') || t.includes('make') || t.includes('n8n')) return { icon: '⚡', label: 'Automation', bg: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' };
+  if (t.includes('writing') || t.includes('content') || t.includes('copy')) return { icon: '✍️', label: 'AI Writing', bg: 'linear-gradient(135deg, #ec4899, #be185d)' };
+  if (t.includes('crm') || t.includes('sales') || t.includes('lead')) return { icon: '💼', label: 'CRM & Sales', bg: 'linear-gradient(135deg, #10b981, #047857)' };
+  if (t.includes('project') || t.includes('task') || t.includes('notion')) return { icon: '📋', label: 'Productivity', bg: 'linear-gradient(135deg, #8b5cf6, #6d28d9)' };
+  if (t.includes('email') || t.includes('inbox')) return { icon: '📧', label: 'Email AI', bg: 'linear-gradient(135deg, #f59e0b, #b45309)' };
+  if (t.includes('scheduling') || t.includes('calendar')) return { icon: '📅', label: 'Scheduling', bg: 'linear-gradient(135deg, #06b6d4, #0e7490)' };
+  return { icon: '🚀', label: 'AI Platform', bg: 'linear-gradient(135deg, #6366f1, #4338ca)' };
+}
+---
+
+<BaseLayout
+  title="All AI Tool Reviews & Comparisons"
+  description="Browse 500+ in-depth reviews and comparisons of AI tools for small business owners and freelancers. Updated weekly."
+>
+  <div class="blog-index">
+
+    <!-- Page header -->
+    <div class="blog-header">
+      <div class="container">
+        <div class="badge badge--amber" style="margin-bottom:1rem">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
+          {posts.length} articles
+        </div>
+        <h1 class="blog-title">AI Tool Reviews & Comparisons</h1>
+        <p class="blog-sub">Find the right tools for your business — without the guesswork.</p>
+
+        <!-- Tag filter -->
+        <div class="tag-filters" id="tag-filters" role="group" aria-label="Filter by category">
+          <button class="tag-btn active" data-tag="all">All</button>
+          {allTags.slice(0, 12).map(tag => (
+            <button class="tag-btn" data-tag={tag}>{tag}</button>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Articles grid -->
+    <div class="container" style="padding-top:3rem;padding-bottom:5rem">
+      <div class="blog-grid" id="blog-grid">
+        {posts.map((post, i) => {
+          const isValidImg = post.data.image && !post.data.image.includes('PLACEHOLDER') && !post.data.image.includes('example.com');
+          const cat = getCategoryFallback(post.data.tags || []);
+          return (
+            <a
+              href={`/blog/${post.slug}`}
+              class="blog-card"
+              data-tags={JSON.stringify(post.data.tags || [])}
+              style={`animation-delay:${Math.min(i, 9) * 40}ms`}
+            >
+              <div class="blog-card-img-wrap">
+                {isValidImg ? (
+                  <>
+                    <img
+                      src={post.data.image}
+                      alt={post.data.title}
+                      loading={i < 6 ? 'eager' : 'lazy'}
+                      decoding="async"
+                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    />
+                    <div class="category-fallback-banner" style={`display: none; background: ${cat.bg};`}>
+                      <span class="cat-fallback-icon">{cat.icon}</span>
+                      <span class="cat-fallback-label">{cat.label}</span>
+                    </div>
+                  </>
+                ) : (
+                  <div class="category-fallback-banner" style={`background: ${cat.bg};`}>
+                    <span class="cat-fallback-icon">{cat.icon}</span>
+                    <span class="cat-fallback-label">{cat.label}</span>
+                  </div>
+                )}
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-card-tags">
+                  {(post.data.tags || []).slice(0,2).map(t => (
+                    <span class="badge badge--ghost">{t}</span>
+                  ))}
+                </div>
+              <h2 class="blog-card-title">{post.data.title}</h2>
+              <p class="blog-card-desc">{post.data.description?.slice(0, 100)}…</p>
+              <div class="blog-card-meta">
+                <time datetime={post.data.pubDate}>
+                  {new Date(post.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </time>
+                {post.data.updatedDate && <span class="updated-tag">Updated</span>}
+              </div>
+            </div>
+          </a>
+        );
+      })}
+      </div>
+
+      <!-- No results -->
+      <div class="no-results" id="no-results" aria-live="polite" hidden>
+        <p>No articles found for this category yet. Check back soon!</p>
+        <button class="btn btn--ghost" onclick="resetFilter()">Show all →</button>
+      </div>
+    </div>
+
+  </div>
+</BaseLayout>
+
+<style>
+  .blog-header {
+    background: linear-gradient(to bottom, var(--c-bg2), var(--c-bg));
+    border-bottom: 1px solid var(--c-border);
+    padding: var(--space-12) 0 var(--space-8);
+  }
+  .blog-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-3); }
+  .blog-sub { color: var(--c-text-2); font-size: 1rem; margin-bottom: var(--space-6); }
+
+  .tag-filters {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+  .tag-btn {
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.35em 0.85em;
+    border-radius: 20px;
+    border: 1px solid var(--c-border);
+    background: transparent;
+    color: var(--c-text-3);
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all var(--dur-fast);
+  }
+  .tag-btn:hover, .tag-btn.active {
+    background: var(--c-amber-dim);
+    border-color: var(--c-amber-glow);
+    color: var(--c-amber);
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-5);
+  }
+  .blog-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--c-bg2);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    text-decoration: none;
+    transition: all var(--dur-mid) var(--ease);
+    animation: fadeUp 0.5s var(--ease) both;
+  }
+  .blog-card:hover {
+    border-color: var(--c-border-mid);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-card);
+  }
+  .blog-card.hidden { display: none; }
+
+  .blog-card-img-wrap {
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    background: var(--c-surface);
+  }
+  .blog-card-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform var(--dur-slow) var(--ease);
+  }
+  .blog-card:hover .blog-card-img-wrap img { transform: scale(1.04); }
+
+  .blog-card-body {
+    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    flex: 1;
+  }
+  .blog-card-tags { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+  .blog-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--c-white);
+    flex: 1;
+    transition: color var(--dur-fast);
+  }
+  .blog-card:hover .blog-card-title { color: var(--c-amber); }
+  .blog-card-desc { font-size: 0.83rem; color: var(--c-text-3); line-height: 1.5; }
+  .blog-card-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: 0.78rem;
+    color: var(--c-text-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--c-border);
+    margin-top: auto;
+  }
+  .updated-tag {
+    background: var(--c-green-dim);
+    color: var(--c-green);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15em 0.5em;
+    border-radius: 10px;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: var(--space-16) 0;
+    color: var(--c-text-2);
+  }
+  .no-results p { margin-bottom: var(--space-4); }
+
+  @media (max-width: 640px) {
+    .blog-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  // Tag filter
+  const buttons = document.querySelectorAll('.tag-btn');
+  const cards   = document.querySelectorAll('.blog-card');
+  const noRes   = document.getElementById('no-results');
+
+  function filterByTag(tag) {
+    let shown = 0;
+    cards.forEach(card => {
+      const tags = JSON.parse(card.dataset.tags || '[]');
+      const show = tag === 'all' || tags.includes(tag);
+      card.classList.toggle('hidden', !show);
+      if (show) shown++;
+    });
+    noRes && (noRes.hidden = shown > 0);
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.tag === tag));
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => filterByTag(btn.dataset.tag));
+  });
+
+  // Check URL param
+  const urlTag = new URLSearchParams(window.location.search).get('tag');
+  if (urlTag) filterByTag(urlTag);
+
+  window.resetFilter = () => filterByTag('all');
+</script>

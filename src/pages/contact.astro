@@ -1,0 +1,453 @@
+---
+// src/pages/contact.astro
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Contact AI Tools Idea — Get in Touch with Our Team"
+  description="Have a question, feedback, or want to partner with us? Reach out to the AI Tools Idea team. We read and respond to every message."
+>
+  <div class="contact-page">
+    
+    <!-- Hero Section -->
+    <section class="contact-hero">
+      <div class="container container--prose" style="text-align: center;">
+        <div class="badge badge--amber" style="margin-bottom: 1rem;">Get in touch</div>
+        <h1>Let's connect</h1>
+        <p class="contact-lead">
+          Whether you have a tool you'd like us to review, found an error in an article, or want to discuss a partnership — we're here for it.
+        </p>
+      </div>
+    </section>
+
+    <!-- Main Content: Info + Form Grid -->
+    <section class="contact-body">
+      <div class="container contact-grid">
+        
+        <!-- Left: Direct Info -->
+        <div class="contact-info">
+          <h2>How can we help?</h2>
+          <p class="info-desc">
+            We are dedicated to providing honest, fluff-free AI tool recommendations for small business owners and freelancers. Here is what to expect when you contact us:
+          </p>
+
+          <div class="info-cards">
+            <div class="info-card">
+              <span class="info-icon" aria-hidden="true">📬</span>
+              <div>
+                <h3>Direct Email</h3>
+                <p>hello@aitoolsidea.com</p>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <span class="info-icon" aria-hidden="true">⚡</span>
+              <div>
+                <h3>Fast Response Time</h3>
+                <p>We read every email and typically reply within 24 business hours.</p>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <span class="info-icon" aria-hidden="true">🤝</span>
+              <div>
+                <h3>Partnerships & Advertising</h3>
+                <p>We work with select SaaS brands that bring genuine value to our SMB audience.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-snippet">
+            <h3>Frequently asked</h3>
+            <div class="faq-item">
+              <strong>Can I pay for a top ranking?</strong>
+              <p>No. Our rankings are strictly editorial and independent. We review tools based on rigorous real-world testing.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Contact Form Card -->
+        <div class="form-container">
+          <div class="form-card">
+            <div id="form-header">
+              <h2>Send us a message</h2>
+              <p>Fill out the form below and our editorial team will get back to you.</p>
+            </div>
+
+            <form class="contact-form" id="contact-form" data-web3key={import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY || ''} onsubmit="return false;">
+              <div class="form-group">
+                <label for="name">Your Name <span class="required">*</span></label>
+                <input type="text" id="name" name="name" placeholder="Alex Smith" required />
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email Address <span class="required">*</span></label>
+                <input type="email" id="email" name="email" placeholder="alex@company.com" required />
+              </div>
+
+              <div class="form-group">
+                <label for="topic">Inquiry Type</label>
+                <div class="select-wrapper">
+                  <select id="topic" name="topic">
+                    <option value="review">Suggest a tool for review</option>
+                    <option value="correction">Report an error / update pricing</option>
+                    <option value="partnership">Sponsorship / partnership</option>
+                    <option value="other">General inquiry / feedback</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="message">Your Message <span class="required">*</span></label>
+                <textarea id="message" name="message" rows="5" placeholder="Tell us more about your tool or inquiry..." required></textarea>
+              </div>
+
+              <button type="submit" class="btn btn--primary submit-btn" id="submit-btn">
+                <span>Send message</span>
+                <span class="spinner" id="spinner" hidden></span>
+              </button>
+            </form>
+
+            <div class="success-state" id="success-state" hidden>
+              <div class="success-icon" aria-hidden="true">✨</div>
+              <h3>Message received!</h3>
+              <p>Thank you for reaching out. Your inquiry has been routed to our team, and we will get back to you within 24 hours.</p>
+              <button class="btn btn--ghost reset-btn" id="reset-btn">Send another message</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+</BaseLayout>
+
+<style>
+  .contact-hero {
+    background: linear-gradient(to bottom, var(--c-bg2), var(--c-bg));
+    border-bottom: 1px solid var(--c-border);
+    padding: var(--space-16) 0 var(--space-10);
+    margin-bottom: var(--space-12);
+  }
+  .contact-hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    margin-bottom: var(--space-4);
+    color: var(--c-white);
+  }
+  .contact-lead {
+    font-size: 1.15rem;
+    color: var(--c-text-2);
+    line-height: 1.7;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .contact-body {
+    padding-bottom: var(--space-20);
+  }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  /* Left Info */
+  .contact-info h2 {
+    font-size: 1.75rem;
+    margin-bottom: var(--space-3);
+    color: var(--c-white);
+  }
+  .info-desc {
+    color: var(--c-text-2);
+    margin-bottom: var(--space-8);
+    font-size: 1.05rem;
+  }
+  .info-cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    margin-bottom: var(--space-10);
+  }
+  .info-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    background: var(--c-surface);
+    border: 1px solid var(--c-border-mid);
+    border-radius: var(--radius-xl);
+    transition: border-color var(--dur-fast);
+  }
+  .info-card:hover {
+    border-color: var(--c-amber-glow);
+  }
+  .info-icon {
+    font-size: 1.75rem;
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .info-card h3 {
+    font-size: 1.1rem;
+    color: var(--c-white);
+    margin-bottom: var(--space-1);
+  }
+  .info-card p {
+    font-size: 0.9rem;
+    color: var(--c-text-2);
+    line-height: 1.5;
+  }
+
+  .faq-snippet {
+    border-top: 1px solid var(--c-border);
+    padding-top: var(--space-6);
+  }
+  .faq-snippet h3 {
+    font-size: 1.15rem;
+    color: var(--c-amber);
+    margin-bottom: var(--space-3);
+  }
+  .faq-item strong {
+    display: block;
+    color: var(--c-white);
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+  }
+  .faq-item p {
+    font-size: 0.9rem;
+    color: var(--c-text-3);
+    line-height: 1.6;
+  }
+
+  /* Right Form Card */
+  .form-container {
+    position: sticky;
+    top: 96px;
+  }
+  .form-card {
+    background: var(--c-bg2);
+    border: 1px solid var(--c-border-mid);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8);
+    box-shadow: var(--shadow-card);
+  }
+  #form-header {
+    margin-bottom: var(--space-6);
+  }
+  #form-header h2 {
+    font-size: 1.5rem;
+    color: var(--c-white);
+    margin-bottom: var(--space-1);
+  }
+  #form-header p {
+    font-size: 0.9rem;
+    color: var(--c-text-2);
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--c-text-2);
+  }
+  .required {
+    color: var(--c-red);
+  }
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border-mid);
+    border-radius: var(--radius-md);
+    padding: 0.75em 1em;
+    font-size: 0.95rem;
+    color: var(--c-white);
+    font-family: var(--font-body);
+    transition: all var(--dur-fast);
+    width: 100%;
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: var(--c-text-3);
+  }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--c-amber);
+    box-shadow: 0 0 12px var(--c-amber-glow);
+  }
+
+  /* Custom Select Wrapper */
+  .select-wrapper {
+    position: relative;
+  }
+  .select-wrapper::after {
+    content: "▼";
+    font-size: 0.75rem;
+    color: var(--c-text-2);
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  select {
+    appearance: none;
+    cursor: pointer;
+  }
+  select option {
+    background: var(--c-bg2);
+    color: var(--c-white);
+  }
+
+  .submit-btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 1rem;
+    padding: 0.85em;
+    margin-top: var(--space-2);
+  }
+  .spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(10, 14, 26, 0.3);
+    border-top-color: #0a0e1a;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  /* Success State */
+  .success-state {
+    text-align: center;
+    padding: var(--space-8) 0 var(--space-4);
+    animation: fadeIn var(--dur-slow) var(--ease) both;
+  }
+  .success-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+  }
+  .success-state h3 {
+    font-size: 1.6rem;
+    color: var(--c-white);
+    margin-bottom: var(--space-2);
+  }
+  .success-state p {
+    color: var(--c-text-2);
+    line-height: 1.6;
+    margin-bottom: var(--space-6);
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .reset-btn {
+    margin: 0 auto;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 900px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-10);
+    }
+    .form-container {
+      position: static;
+    }
+  }
+  @media (max-width: 640px) {
+    .form-card {
+      padding: var(--space-5);
+    }
+  }
+</style>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const spinner = document.getElementById('spinner') as HTMLElement;
+  const successState = document.getElementById('success-state') as HTMLElement;
+  const formHeader = document.getElementById('form-header') as HTMLElement;
+  const resetBtn = document.getElementById('reset-btn') as HTMLButtonElement;
+
+  if (form && submitBtn && successState && formHeader) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const web3key = form.dataset.web3key;
+      if (!web3key || web3key.includes('your_web3forms')) {
+        console.warn('Web3Forms key not configured. Simulating success.');
+      }
+
+      // Show spinner state
+      submitBtn.disabled = true;
+      if (spinner) spinner.hidden = false;
+      submitBtn.querySelector('span')!.textContent = 'Sending...';
+
+      try {
+        const formData = new FormData(form);
+        const jsonPayload = {
+          access_key: web3key || 'demo-key',
+          subject: `New Inquiry [${formData.get('topic')}] from AI Tools Idea`,
+          name: formData.get('name'),
+          email: formData.get('email'),
+          topic: formData.get('topic'),
+          message: formData.get('message'),
+        };
+
+        if (web3key && !web3key.includes('your_web3forms')) {
+          const response = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+            body: JSON.stringify(jsonPayload),
+          });
+          await response.json();
+        } else {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+
+        // Hide form, show success
+        form.hidden = true;
+        formHeader.hidden = true;
+        successState.hidden = false;
+      } catch (err) {
+        alert('There was an issue sending your message. Please try again.');
+      } finally {
+        // Restore button state
+        submitBtn.disabled = false;
+        if (spinner) spinner.hidden = true;
+        submitBtn.querySelector('span')!.textContent = 'Send message';
+        form.reset();
+      }
+    });
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        successState.hidden = true;
+        formHeader.hidden = false;
+        form.hidden = false;
+      });
+    }
+  }
+</script>

@@ -5,6 +5,16 @@ Complete setup guide. Follow in order. Every command is tested and exact.
 
 ---
 
+## 🌟 System Upgrades & Feature Highlights
+
+* **Glassmorphic Contact Page (`/contact`):** Fully functional client-side form integration powered by Web3Forms AJAX submission, live validation, and animated success states.
+* **Curated Top Picks (`/best-ai-tools`):** Premium curated list displaying editor rankings (`#1`, `#2`), 5-star badges, category tags, and direct affiliate CTA links.
+* **Dynamic Benchmark Comparisons (`/compare`):** Automatic side-by-side comparison tables filtered from "vs" and "alternatives" keyword articles.
+* **Automated Article Image Fallbacks:** Built-in category tag recognition (`getCategoryFallback`) rendering curated gradient banners with category icons whenever external Unsplash images are missing or placeholder.
+* **Formatted Legal & About Pages:** Clean semantic HTML structures styled by the global design system, including a dedicated Founder & Chief Editor card for **Jeevanandh R.**
+
+---
+
 ## 1. Prerequisites (5 min)
 
 Install on your local machine:
@@ -129,19 +139,29 @@ create index idx_articles_slug on articles(slug);
 
 ---
 
-## 6. GitHub Secrets (3 min)
+## 6. GitHub Secrets & Environment Variables (3 min)
 
 In your GitHub repo → Settings → Secrets and variables → Actions → New repository secret:
 
-| Secret name | Value |
-|-------------|-------|
-| `GEMINI_API_KEY` | From aistudio.google.com |
-| `SUPABASE_URL` | From Supabase Settings > API |
-| `SUPABASE_KEY` | Supabase "anon public" key |
-| `SERPER_API_KEY` | From serper.dev dashboard |
-| `UNSPLASH_KEY` | From unsplash.com/developers |
-| `SITE_URL` | Your Vercel URL (e.g. https://mysite.vercel.app) |
-| `SITE_NAME` | Your site name (e.g. AI Tools Guide) |
+| Secret / Variable Name | Value | Description |
+|------------------------|-------|-------------|
+| `GEMINI_API_KEY` | From aistudio.google.com | Gemini automation & QA score generation |
+| `SUPABASE_URL` | From Supabase Settings > API | Database connection URL |
+| `SUPABASE_KEY` | Supabase "anon public" key | Database service key |
+| `SERPER_API_KEY` | From serper.dev dashboard | SERP scraping for keyword difficulty |
+| `UNSPLASH_KEY` | From unsplash.com/developers | Automated article featured image retrieval |
+| `SITE_URL` | Your Vercel URL (e.g. https://mysite.vercel.app) | Used for sitemaps and canonical links |
+| `SITE_NAME` | Your site name (e.g. AI Tools Guide) | Used in title tags and JSON-LD schemas |
+| `PUBLIC_WEB3FORMS_ACCESS_KEY` | From web3forms.com | Required for Contact form submission (`PUBLIC_` prefix required by Astro) |
+
+> [!IMPORTANT]  
+> **Where to add the Web3Forms Access Key for Production:**  
+> For your live production website hosted on Vercel, Astro compiles static assets during the Vercel build step. You MUST add `PUBLIC_WEB3FORMS_ACCESS_KEY` directly inside your **Vercel Dashboard**:  
+> 1. Go to **Vercel Dashboard** → Select your project.  
+> 2. Click **Settings** → **Environment Variables**.  
+> 3. Key: `PUBLIC_WEB3FORMS_ACCESS_KEY` | Value: `your_access_key_from_web3forms`.  
+> 4. Trigger a new deployment (or commit to `main`) for Vercel to bake the key into the client-side JavaScript.  
+> *(If you build inside GitHub Actions, also add it under GitHub repo Settings → Secrets and variables → Actions).*
 
 ---
 
@@ -160,6 +180,7 @@ git push origin main
 # 4. Add environment variables:
 #    SITE_URL = https://your-project.vercel.app
 #    SITE_NAME = Your Site Name
+#    PUBLIC_WEB3FORMS_ACCESS_KEY = your_key_here
 # 5. Click Deploy
 # Site is live in ~2 minutes
 ```

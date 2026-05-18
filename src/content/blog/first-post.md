@@ -1,6 +1,6 @@
 ---
 title: "First post"
-description: "This is the first article on my AI tool guide blog. It introduces readers to the purpose of the site, explains the type of tutorials and reviews they can expect."
+description: "This is the first article on my AI tool guide blog. It introduces readers to the purpose of the site, explains the type of tutorials"
 pubDate: "2022-07-08"
 image: "https://example.com/assets/blog-placeholder-3.jpg"
 tags: ["intro", "ai", "tools"]

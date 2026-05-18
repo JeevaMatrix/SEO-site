@@ -1,0 +1,237 @@
+---
+// src/pages/newsletter.astro
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="AI Tools Weekly — Free Newsletter for Small Business Owners"
+  description="Get 3 AI tool reviews, 1 comparison, and the best deals every Tuesday. Free. Join 2,000+ small business owners."
+>
+<div class="newsletter-page">
+
+  <div class="nl-hero">
+    <div class="container nl-hero-inner">
+      <div class="nl-copy">
+        <span class="badge badge--amber">Free newsletter</span>
+        <h1>AI tools, weekly.<br/>No fluff.</h1>
+        <p>Every Tuesday we send small business owners and freelancers:</p>
+        <ul class="nl-benefits">
+          <li>
+            <span class="nl-benefit-icon">🔍</span>
+            <div>
+              <strong>3 tool reviews</strong>
+              <span>New and updated tools, honestly assessed</span>
+            </div>
+          </li>
+          <li>
+            <span class="nl-benefit-icon">⚡</span>
+            <div>
+              <strong>1 comparison</strong>
+              <span>Side-by-side breakdown of competing tools</span>
+            </div>
+          </li>
+          <li>
+            <span class="nl-benefit-icon">💰</span>
+            <div>
+              <strong>Best current deals</strong>
+              <span>Discounts, free trials, and LTD offers</span>
+            </div>
+          </li>
+        </ul>
+        <p class="nl-social-proof">
+          <strong>2,000+</strong> small business owners already subscribed.
+        </p>
+      </div>
+
+      <div class="nl-form-card">
+        <div class="nl-form-header">
+          <div class="nl-form-icon" aria-hidden="true">📬</div>
+          <h2>Subscribe free</h2>
+          <p>One email per week. Unsubscribe any time.</p>
+        </div>
+
+        <form class="nl-form" id="nl-form" action="/api/subscribe" method="POST">
+          <div class="form-group">
+            <label for="nl-email">Email address</label>
+            <input
+              type="email"
+              id="nl-email"
+              name="email"
+              placeholder="you@yourcompany.com"
+              required
+              autocomplete="email"
+            />
+          </div>
+          <button type="submit" class="btn btn--primary nl-submit">
+            Get the free digest →
+          </button>
+          <p class="nl-privacy">
+            We respect your privacy. No spam, ever.
+            <a href="/legal/privacy-policy">Privacy Policy</a>
+          </p>
+        </form>
+
+        <div class="nl-success" id="nl-success" hidden>
+          <div class="success-icon" aria-hidden="true">✅</div>
+          <h3>You're in!</h3>
+          <p>Check your inbox to confirm. First issue arrives this Tuesday.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Past issues preview -->
+  <div class="container nl-preview">
+    <h2 class="section-title">What you'll get</h2>
+    <div class="nl-preview-grid">
+      <div class="nl-preview-card">
+        <span class="nl-preview-num">01</span>
+        <h3>Tool of the week</h3>
+        <p>A deep-dive review of one AI tool — pricing, features, who it's for, and our verdict.</p>
+      </div>
+      <div class="nl-preview-card">
+        <span class="nl-preview-num">02</span>
+        <h3>Head-to-head comparison</h3>
+        <p>We pick two competing tools and tell you exactly which one to choose and why.</p>
+      </div>
+      <div class="nl-preview-card">
+        <span class="nl-preview-num">03</span>
+        <h3>Quick picks</h3>
+        <p>Two or three shorter reviews of tools worth knowing about this week.</p>
+      </div>
+      <div class="nl-preview-card">
+        <span class="nl-preview-num">04</span>
+        <h3>Deals & free trials</h3>
+        <p>The best limited-time offers and free tiers worth trying this week.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</BaseLayout>
+
+<style>
+  .nl-hero {
+    background: linear-gradient(135deg, var(--c-bg2), var(--c-bg3));
+    border-bottom: 1px solid var(--c-border);
+    padding: var(--space-16) 0;
+  }
+  .nl-hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+    align-items: center;
+  }
+
+  /* Copy */
+  .nl-copy h1 { font-size: clamp(2rem, 4vw, 3rem); margin: var(--space-4) 0; }
+  .nl-copy > p { color: var(--c-text-2); margin-bottom: var(--space-5); }
+
+  .nl-benefits {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+  .nl-benefits li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+  .nl-benefit-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .nl-benefits strong { display: block; color: var(--c-white); font-weight: 600; margin-bottom: 2px; }
+  .nl-benefits span { font-size: 0.875rem; color: var(--c-text-2); }
+
+  .nl-social-proof { font-size: 0.9rem; color: var(--c-text-2); }
+  .nl-social-proof strong { color: var(--c-amber); }
+
+  /* Form card */
+  .nl-form-card {
+    background: var(--c-bg2);
+    border: 1px solid var(--c-border-mid);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8);
+  }
+  .nl-form-header { text-align: center; margin-bottom: var(--space-6); }
+  .nl-form-icon { font-size: 2.5rem; margin-bottom: var(--space-3); }
+  .nl-form-header h2 { font-size: 1.5rem; margin-bottom: var(--space-2); }
+  .nl-form-header p { color: var(--c-text-2); font-size: 0.9rem; }
+
+  .nl-form { display: flex; flex-direction: column; gap: var(--space-4); }
+  .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
+  .form-group label { font-size: 0.85rem; font-weight: 500; color: var(--c-text-2); }
+  .form-group input {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border-mid);
+    border-radius: var(--radius-md);
+    padding: 0.75em 1em;
+    font-size: 1rem;
+    color: var(--c-white);
+    font-family: var(--font-body);
+    transition: border-color var(--dur-fast);
+    width: 100%;
+  }
+  .form-group input::placeholder { color: var(--c-text-3); }
+  .form-group input:focus { outline: none; border-color: var(--c-amber); }
+
+  .nl-submit { width: 100%; justify-content: center; font-size: 1rem; padding: 0.8em; }
+  .nl-privacy { font-size: 0.78rem; color: var(--c-text-3); text-align: center; }
+  .nl-privacy a { color: var(--c-text-3); text-decoration: underline; }
+
+  .nl-success { text-align: center; padding: var(--space-6) 0; }
+  .success-icon { font-size: 2.5rem; margin-bottom: var(--space-3); }
+  .nl-success h3 { font-size: 1.3rem; margin-bottom: var(--space-2); }
+  .nl-success p { color: var(--c-text-2); }
+
+  /* Preview section */
+  .nl-preview {
+    padding: var(--space-16) var(--space-6);
+  }
+  .nl-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-5);
+    margin-top: var(--space-8);
+  }
+  .nl-preview-card {
+    background: var(--c-bg2);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    transition: border-color var(--dur-fast);
+  }
+  .nl-preview-card:hover { border-color: var(--c-amber-glow); }
+  .nl-preview-num {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--c-amber);
+    opacity: 0.3;
+    display: block;
+    margin-bottom: var(--space-2);
+    line-height: 1;
+  }
+  .nl-preview-card h3 { font-size: 1rem; margin-bottom: var(--space-2); }
+  .nl-preview-card p { font-size: 0.875rem; color: var(--c-text-2); line-height: 1.6; }
+
+  @media (max-width: 768px) {
+    .nl-hero-inner { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  // Simple form handler — replace with Brevo embed if needed
+  const form = document.getElementById('nl-form');
+  const success = document.getElementById('nl-success');
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // TODO: replace this with your actual Brevo form URL
+    // For now, show success state immediately
+    form.hidden = true;
+    if (success) success.hidden = false;
+  });
+</script>

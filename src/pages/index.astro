@@ -1,309 +1,590 @@
 ---
 // src/pages/index.astro
-// Homepage — shows latest articles + niche overview.
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-const posts = (await getCollection('blog'))
-  .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
-  .slice(0, 12);
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = allPosts
+  .sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf());
 
-const SITE_NAME = import.meta.env.SITE_NAME || 'AI Tools Guide';
-const SITE_DESC = 'Honest reviews and comparisons of AI tools for small business owners and freelancers.';
+const featured   = posts[0];
+const recentGrid = posts.slice(1, 7);
+const latest     = posts.slice(7, 13);
+
+function getCategoryFallback(tags = []) {
+  const t = tags.join(' ').toLowerCase();
+  if (t.includes('automation') || t.includes('zapier') || t.includes('make') || t.includes('n8n')) return { icon: '⚡', label: 'Automation', bg: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' };
+  if (t.includes('writing') || t.includes('content') || t.includes('copy')) return { icon: '✍️', label: 'AI Writing', bg: 'linear-gradient(135deg, #ec4899, #be185d)' };
+  if (t.includes('crm') || t.includes('sales') || t.includes('lead')) return { icon: '💼', label: 'CRM & Sales', bg: 'linear-gradient(135deg, #10b981, #047857)' };
+  if (t.includes('project') || t.includes('task') || t.includes('notion')) return { icon: '📋', label: 'Productivity', bg: 'linear-gradient(135deg, #8b5cf6, #6d28d9)' };
+  if (t.includes('email') || t.includes('inbox')) return { icon: '📧', label: 'Email AI', bg: 'linear-gradient(135deg, #f59e0b, #b45309)' };
+  if (t.includes('scheduling') || t.includes('calendar')) return { icon: '📅', label: 'Scheduling', bg: 'linear-gradient(135deg, #06b6d4, #0e7490)' };
+  return { icon: '🚀', label: 'AI Platform', bg: 'linear-gradient(135deg, #6366f1, #4338ca)' };
+}
+
+const featuredValidImg = featured?.data.image && !featured.data.image.includes('PLACEHOLDER') && !featured.data.image.includes('example.com');
+const featuredCat = featured ? getCategoryFallback(featured.data.tags || []) : null;
+
+const CATEGORIES = [
+  { label: 'Automation',      icon: '⚡', href: '/blog?tag=automation',   count: '80+' },
+  { label: 'AI Writing',      icon: '✍️', href: '/blog?tag=ai-writing',   count: '60+' },
+  { label: 'CRM & Sales',     icon: '💼', href: '/blog?tag=crm',          count: '45+' },
+  { label: 'Project Mgmt',    icon: '📋', href: '/blog?tag=project',      count: '55+' },
+  { label: 'Email Tools',     icon: '📧', href: '/blog?tag=email',        count: '30+' },
+  { label: 'Scheduling',      icon: '📅', href: '/blog?tag=scheduling',   count: '25+' },
+];
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{SITE_NAME} — AI Tools for Small Business</title>
-  <meta name="description" content={SITE_DESC} />
-  <meta name="robots" content="index, follow" />
-  <link rel="sitemap" href="/sitemap-index.xml" />
 
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXX');
-  </script>
+<BaseLayout
+  title="AI Tools Idea — Best AI Tools for Small Business"
+  description="Honest, in-depth reviews and comparisons of AI tools for small business owners and freelancers. Find the right tools without the guesswork."
+>
 
-  <style>
-    :root {
-      --accent: #0f6e56;
-      --accent-light: #e1f5ee;
-      --text: #1a1a1a;
-      --text-muted: #6b7280;
-      --border: #e5e7eb;
-      --bg: #ffffff;
-      --card-bg: #f9fafb;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --text: #f0f0f0;
-        --text-muted: #9ca3af;
-        --border: #374151;
-        --bg: #111827;
-        --card-bg: #1f2937;
-      }
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      color: var(--text);
-      background: var(--bg);
-      line-height: 1.6;
-    }
-    .header {
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .logo {
-      font-weight: 700;
-      font-size: 1.2rem;
-      color: var(--accent);
-      text-decoration: none;
-    }
-    .nav a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.9rem;
-      margin-left: 1.5rem;
-    }
-    .hero {
-      max-width: 900px;
-      margin: 4rem auto 3rem;
-      padding: 0 1.5rem;
-      text-align: center;
-    }
-    .hero h1 {
-      font-size: 2.5rem;
-      line-height: 1.2;
-      margin-bottom: 1rem;
-      color: var(--text);
-    }
-    .hero p {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      max-width: 580px;
-      margin: 0 auto 2rem;
-    }
-    .badge {
-      display: inline-block;
-      background: var(--accent-light);
-      color: var(--accent);
-      padding: 0.3rem 0.8rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-    .articles-grid {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 1.5rem 4rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.25rem;
-    }
-    .article-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      text-decoration: none;
-      color: inherit;
-      transition: border-color 0.15s, transform 0.1s;
-      display: flex;
-      flex-direction: column;
-    }
-    .article-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-    }
-    .card-img {
-      width: 100%;
-      aspect-ratio: 16/9;
-      object-fit: cover;
-    }
-    .card-body {
-      padding: 1rem 1.25rem;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    .card-tags {
-      display: flex;
-      gap: 0.4rem;
-      margin-bottom: 0.6rem;
-      flex-wrap: wrap;
-    }
-    .card-tag {
-      font-size: 0.72rem;
-      background: var(--accent-light);
-      color: var(--accent);
-      padding: 0.15rem 0.5rem;
-      border-radius: 10px;
-      font-weight: 500;
-    }
-    .card-title {
-      font-size: 1rem;
-      font-weight: 600;
-      line-height: 1.35;
-      margin-bottom: 0.5rem;
-      color: var(--text);
-    }
-    .card-desc {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      flex: 1;
-      line-height: 1.5;
-    }
-    .card-date {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-top: 0.75rem;
-    }
-    .section-title {
-      max-width: 1100px;
-      margin: 0 auto 1rem;
-      padding: 0 1.5rem;
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .email-section {
-      background: var(--accent-light);
-      padding: 3rem 1.5rem;
-      text-align: center;
-      margin: 2rem 0;
-    }
-    .email-section h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
-    .email-section p { color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.95rem; }
-    .email-form {
-      display: flex;
-      gap: 0.5rem;
-      max-width: 420px;
-      margin: 0 auto;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .email-form input {
-      flex: 1;
-      min-width: 200px;
-      padding: 0.65rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 0.95rem;
-      background: white;
-    }
-    .email-form button {
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 0.65rem 1.25rem;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.95rem;
-    }
-    .footer {
-      border-top: 1px solid var(--border);
-      padding: 2rem 1.5rem;
-      text-align: center;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-    }
-    @media (max-width: 640px) {
-      .hero h1 { font-size: 1.75rem; }
-      .articles-grid { grid-template-columns: 1fr; }
-    }
-  </style>
-</head>
-<body>
-  <header class="header">
-    <a href="/" class="logo">{SITE_NAME}</a>
-    <nav class="nav">
-      <a href="/blog">All reviews</a>
-      <a href="/best-ai-tools">Top picks</a>
-    </nav>
-  </header>
-
+  <!-- ═══ HERO ════════════════════════════════════════════ -->
   <section class="hero">
-    <div class="badge">Updated weekly</div>
-    <h1>Find the Best AI Tools for Your Small Business</h1>
-    <p>Honest, in-depth reviews and comparisons of automation and AI tools — so you don't waste money on the wrong software.</p>
-  </section>
+    <div class="hero-bg" aria-hidden="true">
+      <div class="hero-orb hero-orb--1"></div>
+      <div class="hero-orb hero-orb--2"></div>
+      <div class="hero-grid"></div>
+    </div>
 
-  <div class="section-title">Latest reviews &amp; comparisons</div>
+    <div class="container hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge animate-fade-up">
+          <span class="badge badge--amber">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
+            Updated weekly
+          </span>
+        </div>
 
-  <div class="articles-grid">
-    {posts.map(post => (
-      <a class="article-card" href={`/blog/${post.slug}`}>
-        {post.data.image && (
-          <img
-            class="card-img"
-            src={post.data.image}
-            alt={post.data.title}
-            loading="lazy"
-          />
-        )}
-        <div class="card-body">
-          {post.data.tags && post.data.tags.length > 0 && (
-            <div class="card-tags">
-              {post.data.tags.slice(0, 2).map(tag => (
-                <span class="card-tag">{tag}</span>
-              ))}
-            </div>
-          )}
-          <div class="card-title">{post.data.title}</div>
-          <div class="card-desc">{post.data.description?.slice(0, 100)}...</div>
-          <div class="card-date">
-            {new Date(post.data.pubDate).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}
+        <h1 class="hero-title animate-fade-up delay-1">
+          Find the <em>right</em> AI tools<br />
+          for your business
+        </h1>
+
+        <p class="hero-sub animate-fade-up delay-2">
+          Honest, in-depth reviews of AI and automation tools for small business owners and freelancers. No sponsored rankings. No fluff.
+        </p>
+
+        <div class="hero-actions animate-fade-up delay-3">
+          <a href="/best-ai-tools" class="btn btn--primary">
+            See top picks →
+          </a>
+          <a href="/newsletter" class="btn btn--ghost">
+            Weekly digest
+          </a>
+        </div>
+
+        <div class="hero-stats animate-fade-up delay-4">
+          <div class="stat">
+            <strong>500+</strong>
+            <span>Tools reviewed</span>
+          </div>
+          <div class="stat-divider" aria-hidden="true"></div>
+          <div class="stat">
+            <strong>100%</strong>
+            <span>Independent</span>
+          </div>
+          <div class="stat-divider" aria-hidden="true"></div>
+          <div class="stat">
+            <strong>Weekly</strong>
+            <span>Updated</span>
           </div>
         </div>
-      </a>
-    ))}
-  </div>
+      </div>
 
-  <!-- Email capture — connects to Brevo (free up to 300 emails/day) -->
-  <section class="email-section">
-    <h2>Get the weekly AI tools digest</h2>
-    <p>New tool reviews, best deals, and automation tips — straight to your inbox. Free.</p>
-    <form
-      class="email-form"
-      action="https://app.brevo.com/api/sendinblue/v3/contacts"
-      method="POST"
-      id="email-form"
-    >
-      <input type="email" name="email" placeholder="your@email.com" required />
-      <button type="submit">Subscribe free</button>
-    </form>
-    <script>
-      // Replace with your Brevo embed form ID for proper handling
-      document.getElementById('email-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = this.querySelector('input[type=email]').value;
-        // Point to your Brevo list form URL
-        window.location.href = `https://your-brevo-form-url.com?email=${encodeURIComponent(email)}`;
-      });
-    </script>
+      <!-- Featured article -->
+      {featured && (
+        <a href={`/blog/${featured.slug}`} class="hero-featured animate-fade-up delay-2">
+          <div class="hero-featured-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--c-amber)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Featured
+          </div>
+          <div class="featured-img-container" style="position: relative; width: 100%; min-height: 200px; display: flex; background: var(--c-surface);">
+            {featuredValidImg ? (
+              <>
+                <img src={featured.data.image} alt={featured.data.title} loading="eager" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <div class="category-fallback-banner" style={`display: none; background: ${featuredCat?.bg};`}>
+                  <span class="cat-fallback-icon">{featuredCat?.icon}</span>
+                  <span class="cat-fallback-label">{featuredCat?.label}</span>
+                </div>
+              </>
+            ) : (
+              <div class="category-fallback-banner" style={`background: ${featuredCat?.bg};`}>
+                <span class="cat-fallback-icon">{featuredCat?.icon}</span>
+                <span class="cat-fallback-label">{featuredCat?.label}</span>
+              </div>
+            )}
+          </div>
+          <div class="hero-featured-body">
+            {featured.data.tags?.slice(0,1).map(t => <span class="badge badge--amber">{t}</span>)}
+            <h2>{featured.data.title}</h2>
+            <p>{featured.data.description?.slice(0, 110)}…</p>
+            <span class="read-more">Read article →</span>
+          </div>
+        </a>
+      )}
+    </div>
   </section>
 
-  <footer class="footer">
-    <p>
-      {SITE_NAME} — Honest reviews for small business owners.
-      <br />
-      <a href="/privacy">Privacy</a> · <a href="/affiliate-disclosure">Affiliate disclosure</a> · <a href="/contact">Contact</a>
-    </p>
-  </footer>
-</body>
-</html>
+  <!-- ═══ CATEGORIES ═════════════════════════════════════ -->
+  <section class="categories section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Browse by category</h2>
+        <a href="/blog" class="section-link">All reviews →</a>
+      </div>
+      <div class="categories-grid">
+        {CATEGORIES.map(cat => (
+          <a href={cat.href} class="cat-card">
+            <span class="cat-icon" aria-hidden="true">{cat.icon}</span>
+            <span class="cat-label">{cat.label}</span>
+            <span class="cat-count">{cat.count} articles</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ RECENT GRID ════════════════════════════════════ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Latest reviews</h2>
+        <a href="/blog" class="section-link">View all →</a>
+      </div>
+      <div class="articles-grid">
+        {recentGrid.map((post, i) => {
+          const isValidImg = post.data.image && !post.data.image.includes('PLACEHOLDER') && !post.data.image.includes('example.com');
+          const cat = getCategoryFallback(post.data.tags || []);
+          return (
+            <a href={`/blog/${post.slug}`} class="article-card" style={`animation-delay:${i * 60}ms`}>
+              <div class="card-image-wrap">
+                {isValidImg ? (
+                  <>
+                    <img
+                      src={post.data.image}
+                      alt={post.data.title}
+                      class="card-image"
+                      loading="lazy"
+                      decoding="async"
+                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    />
+                    <div class="category-fallback-banner" style={`display: none; background: ${cat.bg};`}>
+                      <span class="cat-fallback-icon">{cat.icon}</span>
+                      <span class="cat-fallback-label">{cat.label}</span>
+                    </div>
+                  </>
+                ) : (
+                  <div class="category-fallback-banner" style={`background: ${cat.bg};`}>
+                    <span class="cat-fallback-icon">{cat.icon}</span>
+                    <span class="cat-fallback-label">{cat.label}</span>
+                  </div>
+                )}
+              </div>
+              <div class="card-body">
+                {post.data.tags?.[0] && (
+                  <span class="badge badge--amber card-tag">{post.data.tags[0]}</span>
+                )}
+                <h3 class="card-title">{post.data.title}</h3>
+                <p class="card-desc">{post.data.description?.slice(0, 95)}…</p>
+                <div class="card-meta">
+                  <time datetime={post.data.pubDate} class="card-date">
+                    {new Date(post.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </time>
+                  <span class="card-arrow" aria-hidden="true">→</span>
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ NEWSLETTER BANNER ══════════════════════════════ -->
+  <section class="newsletter-banner section">
+    <div class="container">
+      <div class="newsletter-banner-inner">
+        <div class="newsletter-banner-copy">
+          <h2>Stay ahead of the AI tool curve</h2>
+          <p>Every Tuesday: 3 tool reviews, 1 comparison, and the best deals — in under 5 minutes. Join 2,000+ small business owners.</p>
+        </div>
+        <form class="newsletter-form" action="/api/subscribe" method="POST" id="nl-form">
+          <input type="email" name="email" placeholder="your@email.com" required aria-label="Email address" />
+          <button type="submit" class="btn btn--primary">Subscribe free</button>
+        </form>
+        <p class="newsletter-note">No spam. Unsubscribe any time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ LATEST LIST ════════════════════════════════════ -->
+  {latest.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">More reviews</h2>
+        </div>
+        <div class="list-articles">
+          {latest.map(post => {
+            const isValidImg = post.data.image && !post.data.image.includes('PLACEHOLDER') && !post.data.image.includes('example.com');
+            const cat = getCategoryFallback(post.data.tags || []);
+            return (
+              <a href={`/blog/${post.slug}`} class="list-article">
+                <div class="list-article-img-container" style="width: 100px; height: 70px; flex-shrink: 0; border-radius: var(--radius-md); overflow: hidden; position: relative;">
+                  {isValidImg ? (
+                    <>
+                      <img src={post.data.image} alt="" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" aria-hidden="true" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                      <div class="category-fallback-banner" style={`display: none; background: ${cat.bg}; min-height: 100%; padding: 0;`}>
+                        <span style="font-size: 1.6rem; animation: none;">{cat.icon}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div class="category-fallback-banner" style={`background: ${cat.bg}; min-height: 100%; padding: 0;`}>
+                      <span style="font-size: 1.6rem; animation: none;">{cat.icon}</span>
+                    </div>
+                  )}
+                </div>
+                <div class="list-article-body">
+                  {post.data.tags?.[0] && <span class="badge badge--ghost">{post.data.tags[0]}</span>}
+                  <h3>{post.data.title}</h3>
+                  <p>{post.data.description?.slice(0, 80)}…</p>
+                </div>
+                <span class="list-article-arrow" aria-hidden="true">→</span>
+              </a>
+            );
+          })}
+        </div>
+        <div style="text-align:center;margin-top:2rem">
+          <a href="/blog" class="btn btn--ghost">View all articles →</a>
+        </div>
+      </div>
+    </section>
+  )}
+
+</BaseLayout>
+
+<style>
+  /* ── Hero ─────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    padding: var(--space-16) 0 var(--space-20);
+    overflow: hidden;
+    border-bottom: 1px solid var(--c-border);
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.25;
+  }
+  .hero-orb--1 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #f59e0b, transparent 70%);
+    top: -200px; right: -100px;
+  }
+  .hero-orb--2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #3b82f6, transparent 70%);
+    bottom: -150px; left: -50px;
+  }
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+  }
+
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-badge { margin-bottom: var(--space-5); }
+
+  .hero-title {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    color: var(--c-white);
+    margin-bottom: var(--space-5);
+  }
+  .hero-title em {
+    font-style: normal;
+    color: var(--c-amber);
+    position: relative;
+  }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--c-text-2);
+    line-height: 1.7;
+    margin-bottom: var(--space-8);
+    max-width: 480px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-10);
+  }
+
+  .hero-stats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+  }
+  .stat { display: flex; flex-direction: column; }
+  .stat strong { font-family: var(--font-display); font-size: 1.4rem; color: var(--c-white); }
+  .stat span { font-size: 0.8rem; color: var(--c-text-3); }
+  .stat-divider { width: 1px; height: 36px; background: var(--c-border); }
+
+  /* Featured card */
+  .hero-featured {
+    display: flex;
+    flex-direction: column;
+    background: var(--c-bg2);
+    border: 1px solid var(--c-border-mid);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    transition: border-color var(--dur-mid), transform var(--dur-mid) var(--ease);
+    text-decoration: none;
+  }
+  .hero-featured:hover {
+    border-color: var(--c-amber-glow);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-glow);
+  }
+  .hero-featured-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-amber);
+    padding: var(--space-4) var(--space-5) 0;
+  }
+  .hero-featured img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    border-radius: 0;
+  }
+  .hero-featured-body { padding: var(--space-5); }
+  .hero-featured-body h2 {
+    font-size: 1.2rem;
+    margin: var(--space-3) 0 var(--space-2);
+    color: var(--c-white);
+  }
+  .hero-featured-body p { font-size: 0.875rem; color: var(--c-text-2); margin-bottom: var(--space-4); }
+  .read-more { font-size: 0.875rem; color: var(--c-amber); font-weight: 600; }
+
+  /* ── Sections ─────────────────────────────────────────── */
+  .section { padding: var(--space-16) 0; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: var(--space-8);
+  }
+  .section-title {
+    font-size: 1.5rem;
+    color: var(--c-white);
+    letter-spacing: -0.02em;
+  }
+  .section-link {
+    font-size: 0.875rem;
+    color: var(--c-amber);
+    font-weight: 500;
+    transition: opacity var(--dur-fast);
+  }
+  .section-link:hover { opacity: 0.75; }
+
+  /* ── Categories ───────────────────────────────────────── */
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--space-3);
+  }
+  .cat-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    background: var(--c-bg2);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-lg);
+    transition: all var(--dur-fast) var(--ease);
+    text-decoration: none;
+  }
+  .cat-card:hover {
+    border-color: var(--c-amber-glow);
+    background: var(--c-amber-dim);
+    transform: translateY(-2px);
+  }
+  .cat-icon { font-size: 1.5rem; }
+  .cat-label { font-family: var(--font-display); font-size: 0.9rem; font-weight: 600; color: var(--c-white); }
+  .cat-count { font-size: 0.75rem; color: var(--c-text-3); }
+
+  /* ── Article cards grid ──────────────────────────────── */
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-5);
+  }
+  .article-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--c-bg2);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    text-decoration: none;
+    transition: all var(--dur-mid) var(--ease);
+    animation: fadeUp 0.5s var(--ease) both;
+  }
+  .article-card:hover {
+    border-color: var(--c-border-mid);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-card);
+  }
+  .card-image-wrap {
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    background: var(--c-surface);
+  }
+  .card-image {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform var(--dur-slow) var(--ease);
+  }
+  .article-card:hover .card-image { transform: scale(1.04); }
+
+  .card-body {
+    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    flex: 1;
+  }
+  .card-tag { align-self: flex-start; }
+  .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--c-white);
+    flex: 1;
+    transition: color var(--dur-fast);
+  }
+  .article-card:hover .card-title { color: var(--c-amber); }
+  .card-desc { font-size: 0.835rem; color: var(--c-text-3); line-height: 1.5; }
+  .card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--c-border);
+  }
+  .card-date { font-size: 0.78rem; color: var(--c-text-3); }
+  .card-arrow { color: var(--c-amber); font-size: 0.9rem; opacity: 0; transition: opacity var(--dur-fast), transform var(--dur-fast); }
+  .article-card:hover .card-arrow { opacity: 1; transform: translateX(4px); }
+
+  /* ── Newsletter banner ────────────────────────────────── */
+  .newsletter-banner { background: linear-gradient(135deg, var(--c-bg2), var(--c-bg3)); border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border); }
+  .newsletter-banner-inner {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .newsletter-banner-copy h2 { font-size: 1.75rem; margin-bottom: var(--space-3); }
+  .newsletter-banner-copy p { color: var(--c-text-2); font-size: 0.95rem; margin-bottom: var(--space-6); }
+  .newsletter-form {
+    display: flex;
+    gap: var(--space-3);
+    max-width: 440px;
+    margin: 0 auto var(--space-3);
+  }
+  .newsletter-form input {
+    flex: 1;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border-mid);
+    border-radius: var(--radius-md);
+    padding: 0.65em 1em;
+    font-size: 0.95rem;
+    color: var(--c-white);
+    font-family: var(--font-body);
+    transition: border-color var(--dur-fast);
+  }
+  .newsletter-form input::placeholder { color: var(--c-text-3); }
+  .newsletter-form input:focus { outline: none; border-color: var(--c-amber); }
+  .newsletter-note { font-size: 0.78rem; color: var(--c-text-3); }
+
+  /* ── List articles ────────────────────────────────────── */
+  .list-articles { display: flex; flex-direction: column; }
+  .list-article {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--c-border);
+    text-decoration: none;
+    transition: all var(--dur-fast);
+  }
+  .list-article:hover { padding-left: var(--space-2); }
+  .list-article-img {
+    width: 80px; height: 55px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+    border: 1px solid var(--c-border);
+  }
+  .list-article-body { flex: 1; min-width: 0; }
+  .list-article-body h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--c-white);
+    margin: var(--space-1) 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color var(--dur-fast);
+  }
+  .list-article:hover .list-article-body h3 { color: var(--c-amber); }
+  .list-article-body p { font-size: 0.8rem; color: var(--c-text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .list-article-arrow { color: var(--c-text-3); font-size: 1rem; flex-shrink: 0; transition: all var(--dur-fast); }
+  .list-article:hover .list-article-arrow { color: var(--c-amber); transform: translateX(4px); }
+
+  /* ── Responsive ───────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-featured { display: none; }
+    .hero-title { font-size: 2.2rem; }
+  }
+  @media (max-width: 640px) {
+    .hero { padding: var(--space-10) 0 var(--space-12); }
+    .hero-stats { gap: var(--space-4); }
+    .stat strong { font-size: 1.1rem; }
+    .newsletter-form { flex-direction: column; }
+    .newsletter-form input { width: 100%; }
+    .articles-grid { grid-template-columns: 1fr; }
+  }
+</style>

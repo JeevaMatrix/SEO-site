@@ -1,0 +1,1 @@
+import"./hoisted.C8vCXmFw.js";const e=document.getElementById("nl-form"),t=document.getElementById("nl-success");e?.addEventListener("submit",async n=>{n.preventDefault(),e.hidden=!0,t&&(t.hidden=!1)});

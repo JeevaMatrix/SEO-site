@@ -1,0 +1,320 @@
+---
+// src/pages/compare.astro
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+// Filter comparison articles (e.g., titles with "vs" or "alternatives")
+const comparisons = allPosts.filter(post => 
+  post.data.title.toLowerCase().includes('vs') || 
+  post.data.title.toLowerCase().includes('alternative')
+).sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf());
+---
+
+<BaseLayout
+  title="Compare Best AI Tools — Head-to-Head Comparisons & Alternatives"
+  description="Explore our in-depth head-to-head comparisons and alternatives for Zapier, Notion, ClickUp, and more. Find the perfect fit for your small business."
+>
+  <div class="compare-page">
+    
+    <!-- Hero Section -->
+    <section class="compare-hero">
+      <div class="container container--prose" style="text-align: center;">
+        <div class="badge badge--amber" style="margin-bottom: 1rem;">Head-to-Head Breakdowns</div>
+        <h1>Compare AI & Automation Tools</h1>
+        <p class="compare-lead">
+          Stop guessing which tool is right for you. We break down features, genuine pricing, and real-world performance side-by-side so you can make confident choices.
+        </p>
+      </div>
+    </section>
+
+    <!-- Comparisons List -->
+    <section class="compare-body">
+      <div class="container">
+        
+        <div class="comparisons-grid">
+          {comparisons.map((post, i) => {
+            // Extract two tool names if "vs" is present
+            const titleClean = post.data.title.replace(/— Complete Guide.*/i, '').trim();
+            const parts = titleClean.split(/\s+vs\.?\s+/i);
+            const toolA = parts[0] ? parts[0].trim() : 'Tool';
+            const toolB = parts[1] ? parts[1].trim() : 'Alternatives';
+
+            return (
+              <div class="vs-card" style={`animation-delay: ${i * 60}ms;`}>
+                <div class="vs-badge-container">
+                  <span class="vs-badge">VS</span>
+                </div>
+
+                <div class="vs-header">
+                  <div class="vs-tool">
+                    <h3>{toolA}</h3>
+                  </div>
+                  <div class="vs-tool">
+                    <h3>{toolB}</h3>
+                  </div>
+                </div>
+
+                <div class="vs-body">
+                  <p>{post.data.description}</p>
+                </div>
+
+                <div class="vs-footer">
+                  <div class="tags">
+                    {post.data.tags?.map(t => <span class="badge badge--ghost">{t}</span>)}
+                  </div>
+                  <a href={`/blog/${post.slug}`} class="btn btn--primary btn--sm">View comparison →</a>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {comparisons.length === 0 && (
+          <div class="empty-state">
+            <p>More comparison breakdowns are currently being benchmarked by our team. Check back soon!</p>
+          </div>
+        )}
+
+        <!-- Feature Table Preview -->
+        <div class="comparison-table-wrapper">
+          <div class="table-header">
+            <h2>Popular Workflow Automation Tools</h2>
+            <p>A quick side-by-side benchmark of top automation runners</p>
+          </div>
+
+          <div class="table-responsive">
+            <table class="benchmark-table">
+              <thead>
+                <tr>
+                  <th>Platform</th>
+                  <th>Starting Price</th>
+                  <th>Free Tier</th>
+                  <th>Learning Curve</th>
+                  <th>Best For</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Zapier</strong></td>
+                  <td>$19.99 / mo</td>
+                  <td><span class="status-yes">✓ 100 tasks/mo</span></td>
+                  <td>Low / Beginner</td>
+                  <td>Broad web application connecting</td>
+                  <td><a href="/blog/best-zapier-alternatives-for-freelancers" class="table-link">Compare →</a></td>
+                </tr>
+                <tr>
+                  <td><strong>Make (Integromat)</strong></td>
+                  <td>$9.00 / mo</td>
+                  <td><span class="status-yes">✓ 1,000 ops/mo</span></td>
+                  <td>Medium</td>
+                  <td>Complex multi-step visual workflows</td>
+                  <td><a href="/blog/zapier-alternatives-for-small-business-owners" class="table-link">Compare →</a></td>
+                </tr>
+                <tr>
+                  <td><strong>n8n</strong></td>
+                  <td>$20.00 / mo (or Free Self-host)</td>
+                  <td><span class="status-yes">✓ Self-hosted free</span></td>
+                  <td>High / Dev</td>
+                  <td>Technical users & deep API workflows</td>
+                  <td><a href="/blog/n8n-vs-zapier-for-marketing-automation" class="table-link">Compare →</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+</BaseLayout>
+
+<style>
+  .compare-hero {
+    background: linear-gradient(to bottom, var(--c-bg2), var(--c-bg));
+    border-bottom: 1px solid var(--c-border);
+    padding: var(--space-16) 0 var(--space-10);
+    margin-bottom: var(--space-12);
+  }
+  .compare-hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: var(--space-4);
+    color: var(--c-white);
+  }
+  .compare-lead {
+    font-size: 1.15rem;
+    color: var(--c-text-2);
+    line-height: 1.7;
+    max-width: 650px;
+    margin: 0 auto;
+  }
+
+  .compare-body {
+    padding-bottom: var(--space-20);
+  }
+
+  .comparisons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: var(--space-8);
+    margin-bottom: var(--space-16);
+  }
+
+  .vs-card {
+    background: var(--c-bg2);
+    border: 1px solid var(--c-border-mid);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all var(--dur-mid) var(--ease);
+    box-shadow: var(--shadow-card);
+    animation: fadeUp 0.6s var(--ease) both;
+  }
+  .vs-card:hover {
+    border-color: var(--c-amber-glow);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .vs-badge-container {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+  .vs-badge {
+    background: var(--c-amber);
+    color: #0a0e1a;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.85rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(245,158,11,0.4);
+  }
+
+  .vs-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    text-align: center;
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--c-border);
+  }
+  .vs-tool h3 {
+    font-size: 1.25rem;
+    color: var(--c-white);
+    text-transform: capitalize;
+  }
+
+  .vs-body {
+    color: var(--c-text-2);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: var(--space-6);
+    flex: 1;
+  }
+
+  .vs-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .tags {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: var(--space-12) 0;
+    color: var(--c-text-3);
+  }
+
+  /* Benchmark Table */
+  .comparison-table-wrapper {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border-mid);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8);
+    overflow: hidden;
+  }
+  .table-header {
+    margin-bottom: var(--space-6);
+  }
+  .table-header h2 {
+    font-size: 1.75rem;
+    color: var(--c-white);
+    margin-bottom: var(--space-1);
+  }
+  .table-header p {
+    color: var(--c-text-2);
+    font-size: 0.95rem;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+  .benchmark-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.95rem;
+  }
+  .benchmark-table th {
+    font-family: var(--font-display);
+    color: var(--c-amber);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    background: rgba(0,0,0,0.2);
+    border-bottom: 1px solid var(--c-border-mid);
+  }
+  .benchmark-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--c-border);
+    color: var(--c-text-2);
+  }
+  .benchmark-table tr:last-child td {
+    border-bottom: none;
+  }
+  .benchmark-table tr:hover td {
+    background: rgba(255,255,255,0.02);
+  }
+  .benchmark-table strong {
+    color: var(--c-white);
+    font-size: 1.05rem;
+  }
+  .status-yes {
+    color: var(--c-green);
+    font-weight: 500;
+  }
+  .table-link {
+    color: var(--c-amber);
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  .table-link:hover {
+    color: var(--c-amber-light);
+  }
+
+  @media (max-width: 768px) {
+    .comparisons-grid {
+      grid-template-columns: 1fr;
+    }
+    .comparison-table-wrapper {
+      padding: var(--space-5);
+    }
+  }
+</style>

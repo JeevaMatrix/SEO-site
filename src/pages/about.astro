@@ -1,0 +1,192 @@
+---
+// src/pages/about.astro
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="About AI Tools Idea — Independent AI Tool Reviews by Jeevanandh R."
+  description="AI Tools Idea publishes honest, independent reviews of AI and automation tools for small business owners and freelancers. Founded by Jeevanandh R."
+>
+<div class="about-page">
+  <div class="about-hero">
+    <div class="container container--prose">
+      <div class="badge badge--amber" style="margin-bottom:1rem">About us</div>
+      <h1>We help small businesses<br/>find the right AI tools</h1>
+      <p class="about-lead">
+        AI Tools Idea exists because tool reviews on the internet are mostly terrible — either outdated, sponsored, or written by people who have never actually used the tools in real business scenarios.
+      </p>
+    </div>
+  </div>
+
+  <div class="container container--prose about-body">
+    <div class="prose">
+
+      <h2>What we do</h2>
+      <p>
+        We research, test, benchmark, and compare AI and automation tools specifically for small business owners, solopreneurs, and freelancers — the people who don't have enterprise IT budgets or a dedicated team of operations specialists to figure this stuff out.
+      </p>
+      <p>
+        Every article, benchmark, and breakdown on AI Tools Idea aims to answer one fundamental question: <strong>is this tool actually worth your hard-earned money and time?</strong>
+      </p>
+
+      <h2>Meet the Founder</h2>
+      <div class="founder-card">
+        <div class="founder-avatar" aria-hidden="true">JR</div>
+        <div class="founder-bio">
+          <h3>Jeevanandh R.</h3>
+          <p class="founder-title">Founder & Chief Editor</p>
+          <p class="founder-text">
+            Jeevanandh founded AI Tools Idea to bridge the gap between complex software and busy business owners. With a deep passion for workflow automation and AI efficiency, Jeevanandh personally leads the editorial benchmarking standards, ensuring every tool review is grounded in real-world practicality without marketing fluff.
+          </p>
+        </div>
+      </div>
+
+      <h2>Our editorial standards</h2>
+
+      <div class="standards-list">
+        <div class="standard-item">
+          <h3>Independence</h3>
+          <p>We are not sponsored by any tool vendor. Our rankings and verdicts are based on objective research and analysis — not on who pays us the most advertising revenue.</p>
+        </div>
+
+        <div class="standard-item">
+          <h3>Transparency</h3>
+          <p>We participate in affiliate programmes and disclose every affiliate relationship. A tool we earn a commission from can still get a critical review if its performance or pricing deserves one. See our <a href="/legal/affiliate-disclosure">Affiliate Disclosure</a>.</p>
+        </div>
+
+        <div class="standard-item">
+          <h3>Accuracy & Freshness</h3>
+          <p>Pricing and feature sets change constantly in the SaaS landscape. We include update dates on every article and run automated weekly validation checks to ensure links and data remain accurate.</p>
+        </div>
+
+        <div class="standard-item">
+          <h3>Usefulness</h3>
+          <p>We write for decision-makers who need quick, actionable takeaways, not people looking for 5,000-word academic essays. Our guides are highly structured, practical, and honest.</p>
+        </div>
+      </div>
+
+      <h2>Who reads AI Tools Idea?</h2>
+      <ul>
+        <li>Freelancers and solopreneurs automating their client onboarding and administrative operations</li>
+        <li>Small business owners evaluating software and CRM platforms for their teams (2–50 people)</li>
+        <li>Consultants and agency owners looking for reliable tools to recommend or implement for clients</li>
+        <li>Anyone making the strategic leap from manual spreadsheet processes to AI-assisted workflows</li>
+      </ul>
+
+      <h2>Contact & Partnerships</h2>
+      <p>
+        Have a tool you would like us to review? Found an error in one of our benchmarks? Want to discuss a strategic partnership?
+      </p>
+      <p>
+        Reach out directly via our <a href="/contact">Contact Page</a> or email us at: <strong>hello@aitoolsidea.com</strong>
+      </p>
+      <p>
+        We read every email and typically respond within 24 business hours.
+      </p>
+
+    </div>
+  </div>
+</div>
+</BaseLayout>
+
+<style>
+  .about-hero {
+    background: linear-gradient(to bottom, var(--c-bg2), var(--c-bg));
+    border-bottom: 1px solid var(--c-border);
+    padding: var(--space-16) 0 var(--space-10);
+    margin-bottom: var(--space-12);
+  }
+  .about-hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    margin-bottom: var(--space-4);
+    color: var(--c-white);
+  }
+  .about-lead {
+    font-size: 1.15rem;
+    color: var(--c-text-2);
+    line-height: 1.7;
+    max-width: 650px;
+  }
+  .about-body {
+    padding-bottom: var(--space-20);
+  }
+
+  /* Founder Card */
+  .founder-card {
+    background: linear-gradient(135deg, var(--c-surface), var(--c-bg3));
+    border: 1px solid var(--c-border-mid);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6) var(--space-8);
+    margin: var(--space-6) 0 var(--space-10);
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    box-shadow: var(--shadow-card);
+  }
+  .founder-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--c-amber);
+    color: #0a0e1a;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 24px rgba(245,158,11,0.3);
+  }
+  .founder-bio h3 {
+    font-size: 1.4rem;
+    color: var(--c-white);
+    margin-bottom: 2px;
+  }
+  .founder-title {
+    font-size: 0.9rem;
+    color: var(--c-amber);
+    font-weight: 600;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .founder-text {
+    font-size: 0.95rem;
+    color: var(--c-text-2);
+    line-height: 1.6;
+    margin-bottom: 0 !important;
+  }
+
+  /* Standards List */
+  .standards-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin: var(--space-6) 0 var(--space-10);
+  }
+  .standard-item {
+    background: var(--c-bg2);
+    border-left: 3px solid var(--c-amber);
+    padding: var(--space-4) var(--space-6);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  }
+  .standard-item h3 {
+    font-size: 1.15rem;
+    color: var(--c-white);
+    margin-bottom: var(--space-1);
+  }
+  .standard-item p {
+    font-size: 0.95rem;
+    color: var(--c-text-2);
+    margin-bottom: 0 !important;
+  }
+
+  @media (max-width: 640px) {
+    .founder-card {
+      flex-direction: column;
+      text-align: center;
+      padding: var(--space-6);
+    }
+  }
+</style>

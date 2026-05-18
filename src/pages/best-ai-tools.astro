@@ -1,0 +1,246 @@
+---
+// src/pages/best-ai-tools.astro
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = allPosts.sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf());
+
+// Top curated picks for small businesses
+const topPicks = posts.slice(0, 6);
+
+function getCategoryFallback(tags = []) {
+  const t = tags.join(' ').toLowerCase();
+  if (t.includes('automation') || t.includes('zapier') || t.includes('make') || t.includes('n8n')) return { icon: '⚡', label: 'Automation', bg: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' };
+  if (t.includes('writing') || t.includes('content') || t.includes('copy')) return { icon: '✍️', label: 'AI Writing', bg: 'linear-gradient(135deg, #ec4899, #be185d)' };
+  if (t.includes('crm') || t.includes('sales') || t.includes('lead')) return { icon: '💼', label: 'CRM & Sales', bg: 'linear-gradient(135deg, #10b981, #047857)' };
+  if (t.includes('project') || t.includes('task') || t.includes('notion')) return { icon: '📋', label: 'Productivity', bg: 'linear-gradient(135deg, #8b5cf6, #6d28d9)' };
+  if (t.includes('email') || t.includes('inbox')) return { icon: '📧', label: 'Email AI', bg: 'linear-gradient(135deg, #f59e0b, #b45309)' };
+  if (t.includes('scheduling') || t.includes('calendar')) return { icon: '📅', label: 'Scheduling', bg: 'linear-gradient(135deg, #06b6d4, #0e7490)' };
+  return { icon: '🚀', label: 'AI Platform', bg: 'linear-gradient(135deg, #6366f1, #4338ca)' };
+}
+---
+
+<BaseLayout
+  title="Best AI Tools for Small Businesses in 2026 — Expert Top Picks"
+  description="Our curated list of the absolute best AI and automation tools for freelancers and small businesses in 2026. Hand-tested and verified."
+>
+  <div class="top-picks-page">
+    
+    <!-- Hero Section -->
+    <section class="picks-hero">
+      <div class="container container--prose" style="text-align: center;">
+        <div class="badge badge--amber" style="margin-bottom: 1rem;">Curated Top Picks</div>
+        <h1>Best AI Tools of 2026</h1>
+        <p class="picks-lead">
+          We test dozens of automation and AI platforms every month. Here are the elite tools we recommend for small businesses and freelancers looking to scale their workflows.
+        </p>
+      </div>
+    </section>
+
+    <!-- Curated Grid -->
+    <section class="picks-body">
+      <div class="container">
+        <div class="picks-grid">
+          {topPicks.map((post, i) => {
+            const isValidImg = post.data.image && !post.data.image.includes('PLACEHOLDER') && !post.data.image.includes('example.com');
+            const cat = getCategoryFallback(post.data.tags || []);
+            return (
+              <div class="pick-card" style={`animation-delay: ${i * 70}ms;`}>
+                <a href={`/blog/${post.slug}`} class="pick-img-link">
+                  {isValidImg ? (
+                    <>
+                      <img src={post.data.image} alt={post.data.title} class="pick-img" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                      <div class="category-fallback-banner" style={`display: none; background: ${cat.bg};`}>
+                        <span class="cat-fallback-icon">{cat.icon}</span>
+                        <span class="cat-fallback-label">{cat.label}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div class="category-fallback-banner" style={`background: ${cat.bg};`}>
+                      <span class="cat-fallback-icon">{cat.icon}</span>
+                      <span class="cat-fallback-label">{cat.label}</span>
+                    </div>
+                  )}
+                  <span class="rank-badge">#{i + 1}</span>
+                </a>
+                
+                <div class="pick-content">
+                  <div class="pick-header">
+                    <div class="pick-tags">
+                      {post.data.tags?.map(t => <span class="badge badge--amber">{t}</span>)}
+                    </div>
+                    <div class="pick-rating" title="Editor rating 5/5">⭐⭐⭐⭐⭐</div>
+                  </div>
+
+                  <a href={`/blog/${post.slug}`}>
+                    <h2 class="pick-title">{post.data.title.replace(/— Complete Guide.*/i, '')}</h2>
+                  </a>
+
+                  <p class="pick-desc">{post.data.description}</p>
+
+                  <div class="pick-footer">
+                    <a href={`/blog/${post.slug}`} class="btn btn--ghost btn--sm">Read full review</a>
+                    {post.data.affiliate && (
+                      <a href={`/blog/${post.slug}`} class="btn btn--primary btn--sm">Try {post.data.affiliate} →</a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div class="bottom-cta">
+          <h2>Looking for a specific category?</h2>
+          <p>Explore all our detailed reviews and comparisons across marketing, CRM, and automation.</p>
+          <a href="/blog" class="btn btn--primary">Browse all articles →</a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</BaseLayout>
+
+<style>
+  .picks-hero {
+    background: linear-gradient(to bottom, var(--c-bg2), var(--c-bg));
+    border-bottom: 1px solid var(--c-border);
+    padding: var(--space-16) 0 var(--space-10);
+    margin-bottom: var(--space-12);
+  }
+  .picks-hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: var(--space-4);
+    color: var(--c-white);
+  }
+  .picks-lead {
+    font-size: 1.15rem;
+    color: var(--c-text-2);
+    line-height: 1.7;
+    max-width: 650px;
+    margin: 0 auto;
+  }
+
+  .picks-body {
+    padding-bottom: var(--space-20);
+  }
+  .picks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: var(--space-8);
+  }
+
+  .pick-card {
+    background: var(--c-bg2);
+    border: 1px solid var(--c-border-mid);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all var(--dur-mid) var(--ease);
+    box-shadow: var(--shadow-card);
+    animation: fadeUp 0.6s var(--ease) both;
+  }
+  .pick-card:hover {
+    border-color: var(--c-amber-glow);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .pick-img-link {
+    position: relative;
+    display: block;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+  }
+  .pick-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--dur-slow) var(--ease);
+  }
+  .pick-card:hover .pick-img {
+    transform: scale(1.05);
+  }
+  .rank-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: var(--c-amber);
+    color: #0a0e1a;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+
+  .pick-content {
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .pick-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+  }
+  .pick-tags {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+  .pick-rating {
+    font-size: 0.9rem;
+  }
+
+  .pick-title {
+    font-size: 1.35rem;
+    color: var(--c-white);
+    margin-bottom: var(--space-2);
+    transition: color var(--dur-fast);
+  }
+  .pick-card:hover .pick-title {
+    color: var(--c-amber);
+  }
+
+  .pick-desc {
+    color: var(--c-text-2);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: var(--space-6);
+    flex: 1;
+  }
+
+  .pick-footer {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--c-border);
+    padding-top: var(--space-4);
+  }
+
+  .bottom-cta {
+    margin-top: var(--space-16);
+    padding: var(--space-12) var(--space-6);
+    background: linear-gradient(135deg, var(--c-surface), var(--c-bg3));
+    border: 1px solid var(--c-border-mid);
+    border-radius: var(--radius-2xl);
+    text-align: center;
+  }
+  .bottom-cta h2 {
+    font-size: 2rem;
+    margin-bottom: var(--space-2);
+    color: var(--c-white);
+  }
+  .bottom-cta p {
+    color: var(--c-text-2);
+    max-width: 540px;
+    margin: 0 auto var(--space-6);
+  }
+</style>

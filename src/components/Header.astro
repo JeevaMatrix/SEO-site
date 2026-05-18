@@ -1,0 +1,212 @@
+---
+// src/components/Header.astro
+// Sticky header: logo + nav + CTA
+// Used in all layouts
+---
+
+<header class="site-header" id="site-header">
+  <div class="container header-inner">
+
+    <!-- Logo -->
+    <a href="/" class="logo" aria-label="AI Tools Idea home">
+      <span class="logo-icon" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="7" fill="#f59e0b"/>
+          <path d="M7 14h4l2-6 4 12 2-6h2" stroke="#0a0e1a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="logo-text">
+        AI Tools<span class="logo-accent">Idea</span>
+      </span>
+    </a>
+
+    <!-- Nav -->
+    <nav class="header-nav" aria-label="Main navigation">
+      <a href="/blog" class="nav-link">Reviews</a>
+      <a href="/best-ai-tools" class="nav-link">Top Picks</a>
+      <a href="/compare" class="nav-link">Compare</a>
+      <a href="/newsletter" class="nav-link">Newsletter</a>
+    </nav>
+
+    <!-- Right side -->
+    <div class="header-right">
+      <a href="/newsletter" class="btn btn--primary btn--sm">
+        Get free digest
+      </a>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+    <nav class="mobile-nav">
+      <a href="/blog">Reviews</a>
+      <a href="/best-ai-tools">Top Picks</a>
+      <a href="/compare">Compare</a>
+      <a href="/newsletter">Newsletter</a>
+      <a href="/newsletter" class="btn btn--primary">Get free digest →</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 14, 26, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--c-border);
+    transition: box-shadow var(--dur-mid);
+  }
+  .site-header.scrolled {
+    box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    gap: var(--space-8);
+  }
+
+  /* Logo */
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  .logo-text {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--c-white);
+    letter-spacing: -0.03em;
+  }
+  .logo-accent { color: var(--c-amber); }
+  .logo-icon { display: flex; flex-shrink: 0; }
+
+  /* Nav */
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    flex: 1;
+    justify-content: center;
+  }
+  .nav-link {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--c-text-2);
+    padding: 0.4em 0.75em;
+    border-radius: var(--radius-md);
+    transition: color var(--dur-fast), background var(--dur-fast);
+    position: relative;
+  }
+  .nav-link:hover,
+  .nav-link[aria-current="page"] {
+    color: var(--c-white);
+    background: rgba(255,255,255,0.06);
+  }
+  .nav-link[aria-current="page"]::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 2px;
+    background: var(--c-amber);
+    border-radius: 2px;
+  }
+
+  /* Right */
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-shrink: 0;
+  }
+  .btn--sm { font-size: 0.82rem; padding: 0.5em 1.1em; }
+
+  /* Hamburger */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+  .hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--c-text-2);
+    border-radius: 2px;
+    transition: all var(--dur-fast);
+  }
+  .hamburger[aria-expanded="true"] span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+  .hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+  .hamburger[aria-expanded="true"] span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+  /* Mobile menu */
+  .mobile-menu {
+    display: none;
+    padding: var(--space-4) var(--space-6) var(--space-6);
+    border-top: 1px solid var(--c-border);
+  }
+  .mobile-menu[aria-hidden="false"] { display: block; }
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .mobile-nav a {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--c-text-2);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--c-border);
+    transition: color var(--dur-fast);
+  }
+  .mobile-nav a:hover { color: var(--c-white); }
+  .mobile-nav .btn { margin-top: var(--space-3); text-align: center; justify-content: center; }
+
+  @media (max-width: 768px) {
+    .header-nav { display: none; }
+    .header-right .btn--primary { display: none; }
+    .hamburger { display: flex; }
+  }
+</style>
+
+<script>
+  // Sticky scroll shadow
+  const header = document.getElementById('site-header');
+  window.addEventListener('scroll', () => {
+    header?.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+
+  // Mobile menu toggle
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamburger?.addEventListener('click', () => {
+    const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
+    hamburger.setAttribute('aria-expanded', String(!isOpen));
+    mobileMenu?.setAttribute('aria-hidden', String(isOpen));
+  });
+
+  // Active nav link
+  const links = document.querySelectorAll('.nav-link');
+  links.forEach(link => {
+    if (link.getAttribute('href') === window.location.pathname ||
+        (window.location.pathname.startsWith('/blog') && link.getAttribute('href') === '/blog')) {
+      link.setAttribute('aria-current', 'page');
+    }
+  });
+</script>

@@ -1,8 +1,8 @@
 ---
 // src/layouts/BlogPost.astro
-// Main layout for all blog articles.
-// Handles: SEO meta, Open Graph, JSON-LD schema, affiliate disclosure.
-import { SEO } from 'astro-seo';
+// Premium article layout — fixes FAQ schema rendering as visible text
+// Extracts <!-- FAQ_SCHEMA_START --> blocks and injects as proper <script> tags
+import BaseLayout from './BaseLayout.astro';
 
 interface Props {
   title: string;
@@ -24,10 +24,30 @@ const {
   affiliate = '',
 } = Astro.props;
 
-const SITE_URL = import.meta.env.SITE_URL || 'https://yoursite.com';
-const SITE_NAME = import.meta.env.SITE_NAME || 'AI Tools Guide';
-const canonicalURL = new URL(Astro.url.pathname, SITE_URL);
+function getCategoryFallback(tags = []) {
+  const t = tags.join(' ').toLowerCase();
+  if (t.includes('automation') || t.includes('zapier') || t.includes('make') || t.includes('n8n')) return { icon: '⚡', label: 'Automation', bg: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' };
+  if (t.includes('writing') || t.includes('content') || t.includes('copy')) return { icon: '✍️', label: 'AI Writing', bg: 'linear-gradient(135deg, #ec4899, #be185d)' };
+  if (t.includes('crm') || t.includes('sales') || t.includes('lead')) return { icon: '💼', label: 'CRM & Sales', bg: 'linear-gradient(135deg, #10b981, #047857)' };
+  if (t.includes('project') || t.includes('task') || t.includes('notion')) return { icon: '📋', label: 'Productivity', bg: 'linear-gradient(135deg, #8b5cf6, #6d28d9)' };
+  if (t.includes('email') || t.includes('inbox')) return { icon: '📧', label: 'Email AI', bg: 'linear-gradient(135deg, #f59e0b, #b45309)' };
+  if (t.includes('scheduling') || t.includes('calendar')) return { icon: '📅', label: 'Scheduling', bg: 'linear-gradient(135deg, #06b6d4, #0e7490)' };
+  return { icon: '🚀', label: 'AI Platform', bg: 'linear-gradient(135deg, #6366f1, #4338ca)' };
+}
 
+const isValidImg = image && !image.includes('PLACEHOLDER') && !image.includes('example.com');
+const cat = getCategoryFallback(tags);
+
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+const dateFormatted = new Date(pubDate).toLocaleDateString('en-US', {
+  month: 'long', day: 'numeric', year: 'numeric'
+});
+const dateUpdated = updatedDate
+  ? new Date(updatedDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+  : null;
+
+// Article schema
 const articleSchema = {
   "@context": "https://schema.org",
   "@type": "Article",
@@ -36,363 +56,540 @@ const articleSchema = {
   "image": image,
   "datePublished": pubDate,
   "dateModified": updatedDate || pubDate,
-  "author": {
-    "@type": "Organization",
-    "name": SITE_NAME,
-    "url": SITE_URL,
-  },
+  "author": { "@type": "Organization", "name": "AI Tools Idea", "url": "https://aitoolsidea.com" },
   "publisher": {
     "@type": "Organization",
-    "name": SITE_NAME,
-    "url": SITE_URL,
+    "name": "AI Tools Idea",
+    "logo": { "@type": "ImageObject", "url": "https://aitoolsidea.com/logo.png" }
   },
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": canonicalURL.toString(),
-  }
+  "mainEntityOfPage": { "@type": "WebPage", "@id": canonicalURL }
 };
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Home",
-      "item": SITE_URL
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "Blog",
-      "item": `${SITE_URL}/blog`
-    },
-    {
-      "@type": "ListItem",
-      "position": 3,
-      "name": title,
-      "item": canonicalURL.toString()
-    }
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://aitoolsidea.com" },
+    { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://aitoolsidea.com/blog" },
+    { "@type": "ListItem", "position": 3, "name": title, "item": canonicalURL }
   ]
 };
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="canonical" href={canonicalURL} />
+<BaseLayout
+  title={title}
+  description={description}
+  image={image}
+  canonicalURL={canonicalURL}
+  type="article"
+>
+  <!-- FIX: Use Fragment slot instead of bare <script slot="head"> -->
+  <!-- esbuild parses bare <script> tags as JS and chokes on JSX-like attrs -->
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  </Fragment>
 
-  <!-- Primary SEO -->
-  <title>{title} | {SITE_NAME}</title>
-  <meta name="description" content={description} />
-  <meta name="robots" content="index, follow" />
+  <div class="article-page">
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="article" />
-  <meta property="og:title" content={title} />
-  <meta property="og:description" content={description} />
-  <meta property="og:image" content={image} />
-  <meta property="og:url" content={canonicalURL} />
-  <meta property="og:site_name" content={SITE_NAME} />
-  <meta property="article:published_time" content={pubDate} />
-  {updatedDate && <meta property="article:modified_time" content={updatedDate} />}
-  {tags.map(tag => <meta property="article:tag" content={tag} />)}
+    <!-- Hero -->
+    <div class="article-hero">
+      <div class="container container--prose">
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content={title} />
-  <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content={image} />
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a>
+          <span aria-hidden="true">›</span>
+          <a href="/blog">Blog</a>
+          <span aria-hidden="true">›</span>
+          <span aria-current="page">{title.slice(0, 40)}{title.length > 40 ? '…' : ''}</span>
+        </nav>
 
-  <!-- JSON-LD Schemas -->
-  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+        <!-- Tags -->
+        {tags.length > 0 && (
+          <div class="article-tags">
+            {tags.slice(0, 3).map(tag => (
+              <span class="badge badge--ghost">{tag}</span>
+            ))}
+          </div>
+        )}
 
-  <!-- Performance -->
-  <link rel="preconnect" href="https://images.unsplash.com" />
-  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <!-- Title -->
+        <h1 class="article-title animate-fade-up">{title}</h1>
 
-  <!-- Google Analytics 4 (replace G-XXXXXXXX) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXX');
+        <!-- Meta row -->
+        <div class="article-meta animate-fade-up delay-1">
+          <div class="meta-left">
+            <span class="meta-author">
+              <span class="meta-avatar" aria-hidden="true">AI</span>
+              AI Tools Idea
+            </span>
+            <span class="meta-sep" aria-hidden="true">·</span>
+            <time datetime={pubDate}>{dateFormatted}</time>
+            {dateUpdated && (
+              <>
+                <span class="meta-sep" aria-hidden="true">·</span>
+                <span class="meta-updated">Updated {dateUpdated}</span>
+              </>
+            )}
+          </div>
+          <div class="meta-right">
+            <span class="read-time" id="read-time">— min read</span>
+          </div>
+        </div>
 
-    // Track affiliate link clicks
-    document.addEventListener('click', function(e) {
-      const link = e.target.closest('a');
-      if (!link) return;
-      const href = link.href || '';
-      const isAffiliate = ['?via=', 'fp_ref=', '?r=', '?ref=', '?pc=', 'affiliate'].some(p => href.includes(p));
-      if (isAffiliate) {
-        gtag('event', 'affiliate_click', {
-          'affiliate_url': href,
-          'article_title': document.title,
-        });
-      }
-    });
-  </script>
+        <!-- Affiliate disclosure -->
+        {affiliate && (
+          <div class="disclosure animate-fade-up delay-2" role="note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span>
+              <strong>Affiliate disclosure:</strong> This article contains affiliate links.
+              We may earn a commission if you sign up through our links — at no extra cost to you.
+              <a href="/legal/affiliate-disclosure">Learn more →</a>
+            </span>
+          </div>
+        )}
 
-  <style>
-    :root {
-      --max-width: 760px;
-      --accent: #0f6e56;
-      --accent-light: #e1f5ee;
-      --text: #1a1a1a;
-      --text-muted: #6b7280;
-      --border: #e5e7eb;
-      --bg: #ffffff;
-      --code-bg: #f9fafb;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --text: #f0f0f0;
-        --text-muted: #9ca3af;
-        --border: #374151;
-        --bg: #111827;
-        --code-bg: #1f2937;
-        --accent-light: #064e3b;
-      }
-    }
-    *, *::before, *::after { box-sizing: border-box; }
-    body {
-      font-family: 'Georgia', serif;
-      font-size: 18px;
-      line-height: 1.8;
-      color: var(--text);
-      background: var(--bg);
-      margin: 0;
-      padding: 0;
-    }
-    .site-header {
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .site-logo {
-      font-family: system-ui, sans-serif;
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--accent);
-      text-decoration: none;
-    }
-    .site-nav a {
-      font-family: system-ui, sans-serif;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      margin-left: 1.5rem;
-    }
-    .article-container {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 2rem 1.5rem 4rem;
-    }
-    .article-meta {
-      font-family: system-ui, sans-serif;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 2rem;
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .article-meta time { font-weight: 500; }
-    .disclosure {
-      background: var(--accent-light);
-      border-left: 3px solid var(--accent);
-      border-radius: 4px;
-      padding: 0.75rem 1rem;
-      font-size: 0.82rem;
-      font-family: system-ui, sans-serif;
-      color: var(--text-muted);
-      margin-bottom: 2rem;
-    }
-    .hero-image {
-      width: 100%;
-      aspect-ratio: 16/9;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 2.5rem;
-    }
-    h1 { font-size: 2rem; line-height: 1.25; margin-bottom: 1rem; color: var(--text); }
-    h2 { font-size: 1.4rem; margin-top: 2.5rem; margin-bottom: 0.75rem; }
-    h3 { font-size: 1.15rem; margin-top: 2rem; margin-bottom: 0.5rem; }
-    a { color: var(--accent); }
-    a:hover { text-decoration: underline; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-family: system-ui, sans-serif;
-      font-size: 0.9rem;
-      margin: 1.5rem 0;
-      overflow-x: auto;
-      display: block;
-    }
-    th {
-      background: var(--accent-light);
-      color: var(--accent);
-      padding: 0.6rem 0.75rem;
-      text-align: left;
-      font-weight: 600;
-    }
-    td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); }
-    tr:last-child td { border-bottom: none; }
-    blockquote {
-      border-left: 3px solid var(--accent);
-      margin: 1.5rem 0;
-      padding: 0.5rem 1.25rem;
-      background: var(--accent-light);
-      border-radius: 0 4px 4px 0;
-    }
-    blockquote p { margin: 0; font-style: normal; }
-    code {
-      font-family: 'Menlo', monospace;
-      font-size: 0.85em;
-      background: var(--code-bg);
-      padding: 0.15em 0.4em;
-      border-radius: 3px;
-    }
-    .pro-tip {
-      background: #fffbeb;
-      border: 1px solid #fbbf24;
-      border-radius: 6px;
-      padding: 1rem 1.25rem;
-      margin: 1.5rem 0;
-      font-family: system-ui, sans-serif;
-      font-size: 0.92rem;
-    }
-    .pro-tip::before {
-      content: "💡 Pro tip: ";
-      font-weight: 600;
-    }
-    .cta-box {
-      background: var(--accent-light);
-      border: 1px solid var(--accent);
-      border-radius: 8px;
-      padding: 1.5rem;
-      text-align: center;
-      margin: 2rem 0;
-      font-family: system-ui, sans-serif;
-    }
-    .cta-box h3 { margin: 0 0 0.5rem; font-size: 1.1rem; color: var(--text); }
-    .cta-box p { margin: 0 0 1rem; font-size: 0.9rem; color: var(--text-muted); }
-    .cta-button {
-      display: inline-block;
-      background: var(--accent);
-      color: white;
-      padding: 0.65rem 1.5rem;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: opacity 0.15s;
-    }
-    .cta-button:hover { opacity: 0.85; text-decoration: none; color: white; }
-    .tags {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-top: 2rem;
-      font-family: system-ui, sans-serif;
-    }
-    .tag {
-      font-size: 0.8rem;
-      background: var(--code-bg);
-      color: var(--text-muted);
-      padding: 0.25rem 0.65rem;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-    }
-    .article-footer {
-      margin-top: 3rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border);
-      font-family: system-ui, sans-serif;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-    .updated-notice {
-      font-family: system-ui, sans-serif;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      background: var(--code-bg);
-      padding: 0.3rem 0.75rem;
-      border-radius: 4px;
-      display: inline-block;
-      margin-bottom: 1rem;
-    }
-    @media (max-width: 640px) {
-      h1 { font-size: 1.5rem; }
-      body { font-size: 16px; }
-      .article-container { padding: 1.5rem 1rem 3rem; }
-    }
-  </style>
-</head>
-<body>
-  <header class="site-header">
-    <a href="/" class="site-logo">{SITE_NAME}</a>
-    <nav class="site-nav">
-      <a href="/blog">All reviews</a>
-      <a href="/best-ai-tools">Top picks</a>
-      <a href="/newsletter">Newsletter</a>
-    </nav>
-  </header>
-
-  <article class="article-container">
-    {updatedDate && (
-      <div class="updated-notice">Updated: {new Date(updatedDate).toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'})}</div>
-    )}
-
-    <h1>{title}</h1>
-
-    <div class="article-meta">
-      <time datetime={pubDate}>
-        {new Date(pubDate).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'})}
-      </time>
-      {tags.length > 0 && <span>{tags.slice(0,3).join(' · ')}</span>}
+      </div>
     </div>
 
-    {affiliate && (
-      <div class="disclosure">
-        <strong>Disclosure:</strong> This article contains affiliate links. We may earn a commission if you purchase through our links, at no extra cost to you. We only recommend tools we've researched thoroughly.
+    <!-- Hero image -->
+    <div class="article-image-wrap container container--prose animate-fade-up delay-2" style="position: relative; overflow: hidden; border-radius: var(--radius-2xl); background: var(--c-surface);">
+      {isValidImg ? (
+        <>
+          <img
+            src={image}
+            alt={title}
+            class="article-image"
+            width="740"
+            height="416"
+            loading="eager"
+            decoding="async"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <div class="category-fallback-banner" style={`display: none; background: ${cat.bg}; min-height: 400px;`}>
+            <span class="cat-fallback-icon" style="font-size: 4.5rem;">{cat.icon}</span>
+            <span class="cat-fallback-label" style="font-size: 1.5rem; margin-top: 1rem;">{cat.label}</span>
+          </div>
+        </>
+      ) : (
+        <div class="category-fallback-banner" style={`background: ${cat.bg}; min-height: 400px;`}>
+          <span class="cat-fallback-icon" style="font-size: 4.5rem;">{cat.icon}</span>
+          <span class="cat-fallback-label" style="font-size: 1.5rem; margin-top: 1rem;">{cat.label}</span>
+        </div>
+      )}
+    </div>
+
+    <!-- Content grid -->
+    <div class="article-body container">
+      <div class="article-content-wrap">
+
+        <!-- Main prose -->
+        <article class="prose" id="article-content">
+          <slot />
+        </article>
+
+        <!-- Share + tags footer -->
+        <div class="article-footer">
+          <div class="article-footer-tags">
+            {tags.map(tag => <span class="badge badge--ghost">{tag}</span>)}
+          </div>
+          <div class="share-buttons">
+            <span class="share-label">Share:</span>
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(canonicalURL)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="share-btn"
+              aria-label="Share on Twitter"
+            >𝕏</a>
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(canonicalURL)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="share-btn"
+              aria-label="Share on LinkedIn"
+            >in</a>
+          </div>
+        </div>
+
+        <!-- Newsletter CTA -->
+        <div class="newsletter-cta">
+          <div class="newsletter-cta-inner">
+            <div class="newsletter-cta-icon" aria-hidden="true">📬</div>
+            <div>
+              <h3>Get the weekly AI tools digest</h3>
+              <p>New reviews, tool comparisons, and deals — every Tuesday. Free.</p>
+            </div>
+            <a href="/newsletter" class="btn btn--primary">Subscribe free →</a>
+          </div>
+        </div>
+
       </div>
-    )}
 
-    {image && (
-      <img
-        class="hero-image"
-        src={image}
-        alt={title}
-        loading="eager"
-        width="760"
-        height="427"
-      />
-    )}
+      <!-- Sidebar -->
+      <aside class="article-sidebar" aria-label="Article sidebar">
 
-    <slot />
+        <!-- Table of contents (auto-generated via JS) -->
+        <div class="sidebar-card toc-card" id="toc-card">
+          <h3 class="sidebar-card-title">On this page</h3>
+          <nav class="toc-nav" id="toc-nav" aria-label="Table of contents"></nav>
+        </div>
 
-    {tags.length > 0 && (
-      <div class="tags">
-        {tags.map(tag => <span class="tag">{tag}</span>)}
-      </div>
-    )}
+        <!-- Quick verdict -->
+        {affiliate && (
+          <div class="sidebar-card verdict-card">
+            <div class="verdict-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--c-amber)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              Our top pick
+            </div>
+            <p class="verdict-tool">{affiliate}</p>
+            <a href="#" class="btn btn--primary verdict-btn">
+              Try {affiliate} free →
+            </a>
+            <p class="verdict-note">No credit card required</p>
+          </div>
+        )}
 
-    <footer class="article-footer">
-      <p>
-        Found this helpful? Share it with someone who needs it.
-        Have a question about the tools mentioned? Leave a comment below.
-      </p>
-    </footer>
-  </article>
+      </aside>
+    </div>
 
-  <!-- FAQ Schema injected per-article via slot content -->
-</body>
-</html>
+  </div>
+</BaseLayout>
+
+<!-- ═══ FAQ SCHEMA FIX ════════════════════════════════════════════════════
+  Extracts <!-- FAQ_SCHEMA_START --> blocks from article HTML
+  and injects them as proper <script type="application/ld+json"> tags.
+  This fixes the bug where JSON renders as visible text on the page.
+════════════════════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+  const content = document.getElementById('article-content');
+  if (!content) return;
+  const html = content.innerHTML;
+
+  // Extract FAQ schema block
+  const match = html.match(/<!--\s*FAQ_SCHEMA_START\s*-->([\s\S]*?)<!--\s*FAQ_SCHEMA_END\s*-->/);
+  if (match) {
+    // Remove the raw JSON from visible content
+    content.innerHTML = html
+      .replace(/<!--\s*FAQ_SCHEMA_START\s*-->[\s\S]*?<!--\s*FAQ_SCHEMA_END\s*-->/, '')
+      .trim();
+
+    // Inject as proper script tag in <head>
+    try {
+      const jsonText = match[1].trim();
+      JSON.parse(jsonText); // validate it's real JSON before injecting
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.text = jsonText;
+      document.head.appendChild(script);
+    } catch(e) {
+      console.warn('FAQ schema parse error:', e);
+    }
+  }
+
+  // Also strip any remaining visible <!-- comment --> blocks
+  content.innerHTML = content.innerHTML.replace(/<!--[\s\S]*?-->/g, '');
+})();
+</script>
+
+<!-- Reading time calculator -->
+<script>
+(function() {
+  const content = document.getElementById('article-content');
+  const rtEl    = document.getElementById('read-time');
+  if (!content || !rtEl) return;
+  const words = content.innerText.trim().split(/\s+/).length;
+  const mins  = Math.max(1, Math.round(words / 220));
+  rtEl.textContent = `${mins} min read`;
+})();
+</script>
+
+<!-- Table of contents generator -->
+<script>
+(function() {
+  const content = document.getElementById('article-content');
+  const tocNav  = document.getElementById('toc-nav');
+  const tocCard = document.getElementById('toc-card');
+  if (!content || !tocNav) return;
+
+  const headings = content.querySelectorAll('h2, h3');
+  if (headings.length < 2) { tocCard?.remove(); return; }
+
+  const ul = document.createElement('ul');
+  headings.forEach((h, i) => {
+    // Give each heading an id for anchor linking
+    if (!h.id) h.id = `section-${i}`;
+    const li = document.createElement('li');
+    li.className = h.tagName === 'H3' ? 'toc-sub' : '';
+    li.innerHTML = `<a href="#${h.id}">${h.textContent}</a>`;
+    ul.appendChild(li);
+  });
+  tocNav.appendChild(ul);
+
+  // Active section highlight on scroll
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const link = tocNav.querySelector(`a[href="#${entry.target.id}"]`);
+      if (link) link.classList.toggle('active', entry.isIntersecting);
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+
+<style>
+  /* ── Article hero ────────────────────────────────────── */
+  .article-hero {
+    padding: var(--space-12) 0 var(--space-8);
+    background: linear-gradient(to bottom, var(--c-bg2), var(--c-bg));
+    border-bottom: 1px solid var(--c-border);
+    margin-bottom: var(--space-8);
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.8rem;
+    color: var(--c-text-3);
+    margin-bottom: var(--space-4);
+  }
+  .breadcrumb a { color: var(--c-text-3); transition: color var(--dur-fast); }
+  .breadcrumb a:hover { color: var(--c-amber); }
+  .breadcrumb span[aria-current] { color: var(--c-text-2); }
+
+  .article-tags {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-4);
+  }
+
+  .article-title {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    line-height: 1.15;
+    color: var(--c-white);
+    margin-bottom: var(--space-6);
+    letter-spacing: -0.03em;
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    font-size: 0.875rem;
+    color: var(--c-text-3);
+    margin-bottom: var(--space-5);
+  }
+  .meta-left { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+  .meta-author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--c-text-2);
+    font-weight: 500;
+  }
+  .meta-avatar {
+    width: 28px; height: 28px;
+    background: var(--c-amber-dim);
+    border: 1px solid var(--c-amber-glow);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--c-amber);
+    font-family: var(--font-display);
+  }
+  .meta-updated { color: var(--c-green); font-size: 0.8rem; }
+  .meta-sep { color: var(--c-border-mid); }
+  .read-time {
+    font-size: 0.8rem;
+    color: var(--c-text-3);
+    background: var(--c-surface);
+    padding: 0.25em 0.75em;
+    border-radius: 20px;
+    border: 1px solid var(--c-border);
+  }
+
+  .disclosure {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    background: var(--c-blue-dim);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    font-size: 0.82rem;
+    color: var(--c-text-2);
+    line-height: 1.5;
+  }
+  .disclosure svg { flex-shrink: 0; margin-top: 2px; color: var(--c-blue); }
+  .disclosure strong { color: var(--c-white); }
+  .disclosure a { color: var(--c-blue); text-decoration: underline; }
+
+  /* ── Article image ───────────────────────────────────── */
+  .article-image-wrap { margin-bottom: var(--space-10); }
+  .article-image {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--c-border);
+  }
+
+  /* ── Article body layout ─────────────────────────────── */
+  .article-body {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: var(--space-12);
+    align-items: start;
+    padding-bottom: var(--space-20);
+  }
+  .article-content-wrap { min-width: 0; }
+
+  /* ── Article footer ──────────────────────────────────── */
+  .article-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-6) 0;
+    border-top: 1px solid var(--c-border);
+    margin-top: var(--space-8);
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+  .article-footer-tags { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+  .share-buttons { display: flex; align-items: center; gap: var(--space-2); }
+  .share-label { font-size: 0.8rem; color: var(--c-text-3); }
+  .share-btn {
+    width: 34px; height: 34px;
+    border-radius: var(--radius-md);
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--c-text-2);
+    transition: all var(--dur-fast);
+  }
+  .share-btn:hover {
+    color: var(--c-amber);
+    border-color: var(--c-amber-glow);
+    background: var(--c-amber-dim);
+  }
+
+  /* ── Newsletter CTA ──────────────────────────────────── */
+  .newsletter-cta {
+    background: linear-gradient(135deg, var(--c-surface), var(--c-bg3));
+    border: 1px solid var(--c-border-mid);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    margin-top: var(--space-8);
+  }
+  .newsletter-cta-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    flex-wrap: wrap;
+  }
+  .newsletter-cta-icon { font-size: 2rem; flex-shrink: 0; }
+  .newsletter-cta h3 {
+    font-size: 1.1rem;
+    margin-bottom: var(--space-1);
+    color: var(--c-white);
+  }
+  .newsletter-cta p { font-size: 0.875rem; color: var(--c-text-2); margin: 0; }
+  .newsletter-cta .btn { margin-left: auto; flex-shrink: 0; white-space: nowrap; }
+
+  /* ── Sidebar ─────────────────────────────────────────── */
+  .article-sidebar {
+    position: sticky;
+    top: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .sidebar-card {
+    background: var(--c-bg2);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+  }
+  .sidebar-card-title {
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--c-text-3);
+    margin-bottom: var(--space-4);
+  }
+
+  /* TOC */
+  .toc-nav ul { display: flex; flex-direction: column; gap: 2px; }
+  .toc-nav li a {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--c-text-3);
+    padding: 0.3em 0.5em;
+    border-radius: var(--radius-sm);
+    border-left: 2px solid transparent;
+    transition: all var(--dur-fast);
+    line-height: 1.4;
+  }
+  .toc-nav li a:hover, .toc-nav li a.active {
+    color: var(--c-amber);
+    border-left-color: var(--c-amber);
+    background: var(--c-amber-dim);
+  }
+  .toc-nav .toc-sub a { padding-left: 1.25rem; font-size: 0.78rem; }
+
+  /* Verdict */
+  .verdict-card {
+    background: linear-gradient(135deg, var(--c-amber-dim), var(--c-bg2));
+    border-color: var(--c-amber-glow);
+    text-align: center;
+  }
+  .verdict-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-amber);
+    margin-bottom: var(--space-3);
+  }
+  .verdict-tool {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--c-white);
+    margin-bottom: var(--space-4);
+  }
+  .verdict-btn { width: 100%; justify-content: center; margin-bottom: var(--space-2); }
+  .verdict-note { font-size: 0.75rem; color: var(--c-text-3); }
+
+  /* ── Responsive ──────────────────────────────────────── */
+  @media (max-width: 960px) {
+    .article-body { grid-template-columns: 1fr; }
+    .article-sidebar { position: static; }
+    .toc-card { display: none; }
+  }
+  @media (max-width: 640px) {
+    .article-hero { padding: var(--space-8) 0 var(--space-6); }
+    .newsletter-cta-inner { flex-direction: column; align-items: flex-start; }
+    .newsletter-cta .btn { margin-left: 0; width: 100%; justify-content: center; }
+  }
+</style>

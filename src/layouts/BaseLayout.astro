@@ -1,0 +1,129 @@
+---
+// src/layouts/BaseLayout.astro
+// Root layout — wraps every page with header, footer, global meta
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  canonicalURL?: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  image = '/og-default.png',
+  canonicalURL = new URL(Astro.url.pathname, Astro.site).toString(),
+  type = 'website',
+  noindex = false,
+} = Astro.props;
+
+const siteName = 'AI Tools Idea';
+const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <!-- Primary -->
+  <title>{fullTitle}</title>
+  <meta name="description" content={description} />
+  {noindex
+    ? <meta name="robots" content="noindex, nofollow" />
+    : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  }
+  <link rel="canonical" href={canonicalURL} />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content={type} />
+  <meta property="og:title"       content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image"       content={new URL(image, Astro.site).toString()} />
+  <meta property="og:url"         content={canonicalURL} />
+  <meta property="og:site_name"   content={siteName} />
+  <meta property="og:locale"      content="en_US" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:site"        content="@aitoolsidea" />
+  <meta name="twitter:title"       content={fullTitle} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image"       content={new URL(image, Astro.site).toString()} />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- Sitemap + feeds -->
+  <link rel="sitemap" href="/sitemap-index.xml" />
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Google Analytics (replace G-XXXXXXXXXX) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+    // Track affiliate clicks
+    document.addEventListener('click', e => {
+      const a = e.target.closest('a');
+      if (!a) return;
+      const h = a.href || '';
+      if (['via=','fp_ref=','?r=','ref=','?pc='].some(p => h.includes(p))) {
+        gtag('event','affiliate_click',{link_url:h,page_title:document.title});
+      }
+    });
+  </script>
+
+  <!-- Website schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "AI Tools Idea",
+    "url": "https://aitoolsidea.com",
+    "description": "Honest reviews and comparisons of AI tools for small business owners and freelancers",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://aitoolsidea.com/blog?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- Organization schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "AI Tools Idea",
+    "url": "https://aitoolsidea.com",
+    "logo": "https://aitoolsidea.com/logo.png",
+    "sameAs": [
+      "https://twitter.com/aitoolsidea",
+      "https://linkedin.com/company/aitoolsidea"
+    ]
+  }
+  </script>
+</head>
+<body>
+  <Header />
+  <main id="main-content">
+    <slot />
+  </main>
+  <Footer />
+</body>
+</html>

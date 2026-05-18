@@ -1,20 +1,29 @@
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 
 export default defineConfig({
-  site: process.env.SITE_URL || 'https://yoursite.vercel.app',
+  site: 'https://aitoolsidea.com',
   integrations: [
-    tailwind(),
-    sitemap(),
+    sitemap({
+      changefreq: 'weekly',
+      priority:   0.7,
+      lastmod:    new Date(),
+      customPages: [
+        'https://aitoolsidea.com/best-ai-tools',
+        'https://aitoolsidea.com/compare',
+      ],
+    }),
     mdx(),
   ],
   markdown: {
-    shikiConfig: {
-      theme: 'github-light',
-    },
+    // Allow raw HTML in markdown (needed for schema injection scripts)
+    shikiConfig: { theme: 'github-dark' },
   },
-  output: 'static',  // static HTML — fast, free hosting on Vercel/GitHub Pages
+  output: 'static',
+  build: {
+    // Clean asset names for better caching
+    assets: '_assets',
+  },
 });

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Block legal/noindex pages from crawlers
+Disallow: /api/
+
+Sitemap: https://aitoolsidea.com/sitemap-index.xml

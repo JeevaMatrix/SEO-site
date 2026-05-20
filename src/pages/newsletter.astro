@@ -224,14 +224,65 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </style>
 
 <script>
-  // Simple form handler — replace with Brevo embed if needed
-  const form = document.getElementById('nl-form');
-  const success = document.getElementById('nl-success');
+  const form     = document.getElementById('nl-form');
+  const success  = document.getElementById('nl-success');
+  const emailInp = document.getElementById('nl-email');
+  const submitBtn = form?.querySelector('button[type="submit"]');
+
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    // TODO: replace this with your actual Brevo form URL
-    // For now, show success state immediately
-    form.hidden = true;
-    if (success) success.hidden = false;
+    const email = emailInp?.value?.trim();
+    if (!email) return;
+
+    const originalText = submitBtn?.textContent || 'Get the free digest →';
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Subscribing…'; }
+
+    try {
+      // Brevo (Sendinblue) contacts API — add to list with double opt-in
+      const BREVO_API_KEY  = import.meta.env.PUBLIC_BREVO_API_KEY || '';
+      const BREVO_LIST_ID  = Number(import.meta.env.PUBLIC_BREVO_LIST_ID || '2');
+
+      if (!BREVO_API_KEY) {
+        // Dev fallback — just show success so you can test UI
+        console.warn('PUBLIC_BREVO_API_KEY not set — showing success UI only.');
+        form.hidden = true;
+        if (success) success.hidden = false;
+        return;
+      }
+
+      const res = await fetch('https://api.brevo.com/v3/contacts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'api-key': BREVO_API_KEY,
+        },
+        body: JSON.stringify({
+          email,
+          listIds: [BREVO_LIST_ID],
+          updateEnabled: true,           // re-subscribe if contact existed
+        }),
+      });
+
+      // 201 = created, 204 = already exists & updated — both are success
+      if (res.status === 201 || res.status === 204) {
+        form.hidden = true;
+        if (success) success.hidden = false;
+      } else {
+        const body = await res.json().catch(() => ({}));
+        const msg  = body?.message || `Error ${res.status}`;
+        // Duplicate contact (code 1.1.6 or status 400 with "Contact already exist")
+        if (res.status === 400 && msg.toLowerCase().includes('already exist')) {
+          form.hidden = true;
+          if (success) success.hidden = false;
+        } else {
+          alert(`Could not subscribe: ${msg}. Please try again.`);
+        }
+      }
+    } catch (err) {
+      console.error('Newsletter error:', err);
+      alert('Something went wrong. Please try again.');
+    } finally {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalText; }
+    }
   });
 </script>

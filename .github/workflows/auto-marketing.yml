@@ -1,0 +1,67 @@
+name: Auto-marketing on publish
+# Runs after content-generator pushes new articles
+# 1. Pings IndexNow (instant Google/Bing indexing request)
+# 2. Pings Bing Webmaster API
+# 3. Posts to social via IFTTT webhook (optional)
+
+on:
+  push:
+    paths:
+      - 'src/content/blog/**.md'
+  workflow_dispatch:
+
+jobs:
+  marketing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2   # need previous commit to detect new files
+
+      - name: Detect new articles
+        id: detect
+        run: |
+          NEW=$(git diff --name-only HEAD~1 HEAD -- 'src/content/blog/*.md' | head -10)
+          echo "files=$NEW" >> $GITHUB_OUTPUT
+          # Build URL list from slugs
+          URLS=""
+          for f in $NEW; do
+            SLUG=$(basename "$f" .md)
+            URLS="$URLS ${{ secrets.SITE_URL }}/blog/$SLUG/"
+          done
+          echo "urls=$URLS" >> $GITHUB_OUTPUT
+          echo "count=$(echo $NEW | wc -w)" >> $GITHUB_OUTPUT
+
+      - name: Ping IndexNow (instant Bing + Yandex indexing)
+        if: steps.detect.outputs.count > 0
+        run: |
+          for URL in ${{ steps.detect.outputs.urls }}; do
+            curl -s -X GET \
+              "https://api.indexnow.org/indexnow?url=$URL&key=${{ secrets.INDEXNOW_KEY }}&keyLocation=${{ secrets.SITE_URL }}/${{ secrets.INDEXNOW_KEY }}.txt" \
+              -o /dev/null -w "IndexNow ping: %{http_code} for $URL\n"
+          done
+
+      - name: Ping Google Search Console sitemap
+        if: steps.detect.outputs.count > 0
+        run: |
+          curl -s "https://www.google.com/ping?sitemap=${{ secrets.SITE_URL }}/sitemap-index.xml" \
+            -o /dev/null -w "GSC ping: %{http_code}\n"
+
+      - name: IFTTT social post (optional)
+        if: steps.detect.outputs.count > 0 && secrets.IFTTT_WEBHOOK_KEY != ''
+        run: |
+          # Set up IFTTT applet: Webhook → Twitter/LinkedIn/Buffer
+          # Event name: new_seo_article
+          # Value1 = title, Value2 = URL, Value3 = description
+          FIRST_FILE=$(git diff --name-only HEAD~1 HEAD -- 'src/content/blog/*.md' | head -1)
+          if [ -n "$FIRST_FILE" ]; then
+            SLUG=$(basename "$FIRST_FILE" .md)
+            TITLE=$(grep '^title:' "$FIRST_FILE" | head -1 | sed 's/title: "//;s/"//')
+            DESC=$(grep '^description:' "$FIRST_FILE" | head -1 | sed 's/description: "//;s/"//')
+            URL="${{ secrets.SITE_URL }}/blog/$SLUG/"
+            curl -s -X POST \
+              "https://maker.ifttt.com/trigger/new_seo_article/with/key/${{ secrets.IFTTT_WEBHOOK_KEY }}" \
+              -H "Content-Type: application/json" \
+              -d "{\"value1\":\"$TITLE\",\"value2\":\"$URL\",\"value3\":\"$DESC\"}" \
+              -o /dev/null -w "IFTTT: %{http_code}\n"
+          fi

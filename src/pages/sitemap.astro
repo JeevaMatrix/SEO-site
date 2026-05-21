@@ -1,0 +1,414 @@
+---
+// src/pages/sitemap.astro
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Fetch non-draft blog posts
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const sortedPosts = posts.sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf());
+
+// Category mapper matching blog/index.astro for brand consistency
+function getCategoryInfo(tags: string[] = []) {
+  const t = tags.join(' ').toLowerCase();
+  if (t.includes('automation') || t.includes('zapier') || t.includes('make') || t.includes('n8n')) {
+    return { icon: '⚡', label: 'Automation', color: 'var(--c-blue)', dim: 'var(--c-blue-dim)' };
+  }
+  if (t.includes('writing') || t.includes('content') || t.includes('copy')) {
+    return { icon: '✍️', label: 'AI Writing', color: '#ec4899', dim: 'rgba(236, 72, 153, 0.12)' };
+  }
+  if (t.includes('crm') || t.includes('sales') || t.includes('lead')) {
+    return { icon: '💼', label: 'CRM & Sales', color: 'var(--c-green)', dim: 'var(--c-green-dim)' };
+  }
+  if (t.includes('project') || t.includes('task') || t.includes('notion')) {
+    return { icon: '📋', label: 'Productivity', color: '#8b5cf6', dim: 'rgba(139, 92, 246, 0.12)' };
+  }
+  if (t.includes('email') || t.includes('inbox')) {
+    return { icon: '📧', label: 'Email AI', color: 'var(--c-amber)', dim: 'var(--c-amber-dim)' };
+  }
+  if (t.includes('scheduling') || t.includes('calendar')) {
+    return { icon: '📅', label: 'Scheduling', color: '#06b6d4', dim: 'rgba(6, 182, 212, 0.12)' };
+  }
+  return { icon: '🚀', label: 'AI Platform', color: '#6366f1', dim: 'rgba(99, 102, 241, 0.12)' };
+}
+
+// Group posts by category label
+const groupedPosts = sortedPosts.reduce((acc, post) => {
+  const cat = getCategoryInfo(post.data.tags || []);
+  if (!acc[cat.label]) {
+    acc[cat.label] = {
+      info: cat,
+      items: []
+    };
+  }
+  acc[cat.label].items.push(post);
+  return acc;
+}, {} as Record<string, { info: ReturnType<typeof getCategoryInfo>; items: typeof sortedPosts }>);
+
+const categories = Object.keys(groupedPosts).sort();
+---
+
+<BaseLayout
+  title="Sitemap"
+  description="Navigate all reviews, comparisons, core pages, and legal disclosures on AI Tools Idea. The complete directory of resources."
+>
+  <div class="sitemap-page">
+    
+    <!-- Hero / Header -->
+    <div class="sitemap-hero">
+      <div class="container container--prose">
+        <div class="badge badge--amber" style="margin-bottom: 1rem">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
+          Sitemap Directory
+        </div>
+        <h1 class="sitemap-title">Website Sitemap</h1>
+        <p class="sitemap-sub">
+          A comprehensive human-readable directory of all articles, core tool recommendations, comparative benchmarks, and legal compliance pages.
+        </p>
+      </div>
+    </div>
+
+    <!-- Main Content Section -->
+    <div class="container sitemap-container">
+      
+      <!-- Top level core grids -->
+      <div class="sitemap-meta-grid">
+        
+        <!-- Core Navigation Card -->
+        <div class="sitemap-card animate-fade-up">
+          <div class="sitemap-card-header">
+            <span class="card-icon" style="color: var(--c-amber); background: var(--c-amber-dim);">🧭</span>
+            <h2>Core Pages</h2>
+          </div>
+          <p class="card-desc">Main informational and navigational hubs of our website.</p>
+          <ul class="sitemap-links">
+            <li>
+              <a href="/">
+                <span class="link-label">Homepage</span>
+                <span class="link-path">/</span>
+              </a>
+            </li>
+            <li>
+              <a href="/best-ai-tools">
+                <span class="link-label">Best AI Tools Picks</span>
+                <span class="link-path">/best-ai-tools</span>
+              </a>
+            </li>
+            <li>
+              <a href="/compare">
+                <span class="link-label">All Comparisons & Benchmarks</span>
+                <span class="link-path">/compare</span>
+              </a>
+            </li>
+            <li>
+              <a href="/blog">
+                <span class="link-label">AI Reviews & Guides Catalog</span>
+                <span class="link-path">/blog</span>
+              </a>
+            </li>
+            <li>
+              <a href="/about">
+                <span class="link-label">About AI Tools Idea</span>
+                <span class="link-path">/about</span>
+              </a>
+            </li>
+            <li>
+              <a href="/newsletter">
+                <span class="link-label">Newsletter Subscription</span>
+                <span class="link-path">/newsletter</span>
+              </a>
+            </li>
+            <li>
+              <a href="/contact">
+                <span class="link-label">Contact & Support</span>
+                <span class="link-path">/contact</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Legal and Disclosures Card -->
+        <div class="sitemap-card animate-fade-up delay-1">
+          <div class="sitemap-card-header">
+            <span class="card-icon" style="color: var(--c-green); background: var(--c-green-dim);">⚖️</span>
+            <h2>Legal & Compliance</h2>
+          </div>
+          <p class="card-desc">Our standards, consumer rights, disclosures, and terms.</p>
+          <ul class="sitemap-links">
+            <li>
+              <a href="/legal/affiliate-disclosure">
+                <span class="link-label">Affiliate Disclosure</span>
+                <span class="link-path">/legal/affiliate-disclosure</span>
+              </a>
+            </li>
+            <li>
+              <a href="/legal/privacy-policy">
+                <span class="link-label">Privacy Policy</span>
+                <span class="link-path">/legal/privacy-policy</span>
+              </a>
+            </li>
+            <li>
+              <a href="/legal/terms-of-service">
+                <span class="link-label">Terms of Service</span>
+                <span class="link-path">/legal/terms-of-service</span>
+              </a>
+            </li>
+            <li>
+              <a href="/legal/cookie-policy">
+                <span class="link-label">Cookie Policy</span>
+                <span class="link-path">/legal/cookie-policy</span>
+              </a>
+            </li>
+            <li>
+              <a href="/rss.xml" target="_blank" rel="noopener noreferrer">
+                <span class="link-label">RSS Content Feed</span>
+                <span class="link-path">/rss.xml ↗</span>
+              </a>
+            </li>
+            <li>
+              <a href="/sitemap-index.xml" target="_blank" rel="noopener noreferrer">
+                <span class="link-label">Google XML Sitemap</span>
+                <span class="link-path">/sitemap-index.xml ↗</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Section Title for Blog posts -->
+      <div class="sitemap-section-title animate-fade-up delay-2">
+        <div class="title-line"></div>
+        <h2>Dynamic Reviews & Guides</h2>
+        <div class="title-line"></div>
+      </div>
+
+      <!-- Categories Grids -->
+      <div class="sitemap-categories-grid">
+        {categories.map((catName, index) => {
+          const group = groupedPosts[catName];
+          return (
+            <div class="sitemap-card animate-fade-up" style={`animation-delay: ${(index + 3) * 50}ms`}>
+              <div class="sitemap-card-header">
+                <span class="card-icon" style={`color: ${group.info.color}; background: ${group.info.dim};`}>
+                  {group.info.icon}
+                </span>
+                <h2>{catName}</h2>
+                <span class="count-badge" style={`color: ${group.info.color}; border: 1px solid ${group.info.dim}; background: ${group.info.dim}`}>
+                  {group.items.length} {group.items.length === 1 ? 'post' : 'posts'}
+                </span>
+              </div>
+              <p class="card-desc">Honest breakdowns and deep insights regarding {catName.toLowerCase()} AI tools.</p>
+              <ul class="sitemap-links">
+                {group.items.map(post => (
+                  <li>
+                    <a href={`/blog/${post.slug}`} class="blog-link">
+                      <span class="link-title">{post.data.title}</span>
+                      <time datetime={post.data.pubDate.toISOString()} class="link-date">
+                        {new Date(post.data.pubDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                      </time>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Base Sitemap Styles */
+  .sitemap-hero {
+    background: linear-gradient(to bottom, var(--c-bg2), var(--c-bg));
+    border-bottom: 1px solid var(--c-border);
+    padding: var(--space-16) 0 var(--space-10);
+    margin-bottom: var(--space-12);
+  }
+  .sitemap-title {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    margin-bottom: var(--space-4);
+    color: var(--c-white);
+  }
+  .sitemap-sub {
+    font-size: 1.15rem;
+    color: var(--c-text-2);
+    line-height: 1.7;
+    max-width: 650px;
+  }
+
+  .sitemap-container {
+    padding-bottom: var(--space-24);
+  }
+
+  /* Grid Layouts */
+  .sitemap-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: var(--space-8);
+    margin-bottom: var(--space-16);
+  }
+
+  .sitemap-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--space-8);
+  }
+
+  /* Cards */
+  .sitemap-card {
+    background: linear-gradient(135deg, var(--c-bg2), var(--c-bg3));
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8);
+    transition: all var(--dur-mid) var(--ease);
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+  }
+  .sitemap-card:hover {
+    border-color: var(--c-border-mid);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+  }
+
+  .sitemap-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-2);
+  }
+  .card-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .sitemap-card-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--c-white);
+    letter-spacing: -0.01em;
+  }
+  .count-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2em 0.6em;
+    border-radius: 12px;
+    margin-left: auto;
+    letter-spacing: 0.02em;
+  }
+
+  .card-desc {
+    font-size: 0.85rem;
+    color: var(--c-text-3);
+    margin-bottom: var(--space-6);
+    line-height: 1.5;
+  }
+
+  /* Section Title Divider */
+  .sitemap-section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    margin-bottom: var(--space-10);
+    margin-top: var(--space-6);
+  }
+  .sitemap-section-title h2 {
+    font-size: 1.5rem;
+    color: var(--c-white);
+    font-family: var(--font-display);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .title-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--c-border-mid), transparent);
+  }
+
+  /* Links list */
+  .sitemap-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .sitemap-links li {
+    border-bottom: 1px dashed var(--c-border);
+    padding-bottom: var(--space-3);
+  }
+  .sitemap-links li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .sitemap-links a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--c-text-2);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color var(--dur-fast) var(--ease);
+  }
+  .sitemap-links a:hover {
+    color: var(--c-amber);
+  }
+
+  .link-path {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--c-text-3);
+    background: var(--c-surface);
+    padding: 0.1em 0.5em;
+    border-radius: var(--radius-sm);
+    transition: color var(--dur-fast), background var(--dur-fast);
+  }
+  .sitemap-links a:hover .link-path {
+    color: var(--c-amber-light);
+    background: var(--c-amber-dim);
+  }
+
+  /* Blog link styles */
+  .blog-link {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .link-title {
+    font-size: 0.92rem;
+    line-height: 1.4;
+    transition: color var(--dur-fast);
+    flex: 1;
+  }
+  .link-date {
+    font-size: 0.75rem;
+    color: var(--c-text-3);
+    white-space: nowrap;
+    padding-top: 0.1rem;
+  }
+
+  /* Responsive styling */
+  @media (max-width: 960px) {
+    .sitemap-meta-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .sitemap-categories-grid {
+      grid-template-columns: 1fr;
+    }
+    .sitemap-card {
+      padding: var(--space-6);
+    }
+  }
+</style>

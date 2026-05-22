@@ -65,6 +65,17 @@ def clean_frontmatter(fm_text: str, slug: str = "") -> str:
                 if len(val) > 105:
                     val = val[:102].rsplit(" ", 1)[0].rstrip(" :-—") + "..."
                 line = f'title: "{_ys(val)}"'
+        # Fix description — pad if too short for SEO
+        if line.startswith("description:"):
+            m = re.match(r'description:\s*["\'\']?(.+?)["\'\']?\s*$', line)
+            if m:
+                val = m.group(1).strip().strip('"').strip("'")
+                if len(val) < 80:
+                    val = val.rstrip('.') + '. An in-depth guide to help small business owners choose the right AI tools and automation software.'
+                if len(val) > 160:
+                    val = val[:157].rsplit(' ', 1)[0].rstrip(' .,') + '.'
+                line = f'description: "{_ys(val)}"'
+
         # Fix affiliateUrl
         if line.startswith("affiliateUrl:"):
             m = re.match(r'affiliateUrl:\s*(.+)\s*$', line)

@@ -1,6 +1,7 @@
 ---
 
 
+
 title: "zapier alternatives for small business owners — Complete Guide [2026]"
 description: "Find the best Zapier alternatives for small business owners to automate tasks and boost productivity, with pricing and features compared"
 pubDate: 2026-05-17

@@ -1,5 +1,6 @@
 ---
 
+
 title: "does microsoft have anything similar to zapier — Complete Guide [2026]"
 description: "Discover if Microsoft offers an alternative to Zapier for automating tasks and workflows, and learn about Zapier's features and pricing."
 pubDate: 2026-05-22

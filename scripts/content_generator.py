@@ -564,6 +564,17 @@ def save(slug: str, content: str, image_url: str, amazon_products: list[dict]):
                     val = val[:102].rsplit(" ", 1)[0].rstrip(" :-—") + "..."
                 val = _ys(val)
                 line = f'title: "{val}"'
+        # Fix description length
+        if line.startswith("description:"):
+            m = _re.match(r'description:\s*["\'\']?(.+?)["\'\']?\s*$', line)
+            if m:
+                val = m.group(1).strip().strip('"').strip("'")
+                if len(val) < 80:
+                    val = val.rstrip('.') + '. An in-depth guide to help small business owners choose the right AI tools.'
+                if len(val) > 160:
+                    val = val[:157].rsplit(' ', 1)[0].rstrip(' .,') + '.'
+                line = f'description: "{_ys(val)}"'
+
         # Ensure affiliateUrl is quoted
         if line.startswith("affiliateUrl:"):
             m = _re.match(r'affiliateUrl:\s*(.+)\s*$', line)

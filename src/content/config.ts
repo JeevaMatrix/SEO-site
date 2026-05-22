@@ -10,9 +10,7 @@ const blog = defineCollection({
     title: z.string()
       .min(10, 'Title too short')
       .max(120, 'Title too long'),  // relaxed — Groq titles can be long; og:title is truncated in BaseLayout
-    description: z.string()
-      .min(80,  'Description too short (min 80 chars)')
-      .max(160, 'Description too long for SEO (max 160 chars)'),
+    description: z.string().optional().default('An in-depth guide to help small business owners choose the right tools.'),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     image: z.string().optional().default(

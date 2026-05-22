@@ -6,6 +6,7 @@ image: "https://example.com/assets/blog-placeholder-3.jpg"
 tags: ["intro", "ai", "tools"]
 affiliate: ""
 draft: false
+amazonProducts: []
 ---
 
 

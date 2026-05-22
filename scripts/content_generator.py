@@ -287,28 +287,151 @@ def qa(content: str, keyword: str) -> tuple[int, list[str]]:
 
     return min(100, score + bonus), issues
 
-# ── Images ────────────────────────────────────────────────────────────────────
-FALLBACKS = [
-    "https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&q=80",
-    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80",
-    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
-    "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=1200&q=80",
-]
-_img_i = 0
+# ── Images ─────────────────────────────────────────────────────────────────
+# Priority order:
+# 1. Unsplash API (if key approved — set UNSPLASH_KEY)
+# 2. Pexels API  (free, instant approval — set PEXELS_KEY at pexels.com/api)
+# 3. Picsum Photos (no key, random high-quality — always works)
+# 4. Curated topic-matched Unsplash direct URLs (no API, always works)
+
+PEXELS_KEY = os.environ.get("PEXELS_KEY", "")
+
+# ── Topic → visual search query mapping ──────────────────────────────────────
+# NEVER search the article keyword directly ("zapier vs n8n" = 0 results).
+# Instead map to a generic visual concept that always has stock photos.
+TOPIC_SEARCH_QUERIES = {
+    "zapier":        "workflow automation dashboard",
+    "n8n":           "workflow automation dashboard",
+    "make":          "workflow automation dashboard",
+    "pabbly":        "workflow automation dashboard",
+    "automation":    "workflow automation dashboard",
+    "notion":        "productivity workspace desk",
+    "clickup":       "project management team",
+    "airtable":      "spreadsheet database workspace",
+    "monday":        "team collaboration office",
+    "asana":         "project management team",
+    "crm":           "sales team office meeting",
+    "hubspot":       "sales team office meeting",
+    "pipedrive":     "sales team office meeting",
+    "salesforce":    "sales team office meeting",
+    "email":         "email marketing laptop",
+    "mailchimp":     "email marketing laptop",
+    "brevo":         "email marketing laptop",
+    "writing":       "person writing laptop coffee",
+    "copy":          "person writing laptop coffee",
+    "content":       "person writing laptop coffee",
+    "chatgpt":       "artificial intelligence technology",
+    "ai":            "artificial intelligence technology",
+    "gpt":           "artificial intelligence technology",
+    "freelance":     "freelancer working laptop home",
+    "solopreneur":   "freelancer working laptop home",
+    "scheduling":    "calendar planning desk",
+    "calendly":      "calendar planning desk",
+    "booking":       "calendar planning desk",
+    "project":       "project management team whiteboard",
+    "marketing":     "digital marketing analytics chart",
+    "seo":           "seo analytics laptop chart",
+    "social media":  "social media phone laptop",
+    "sales":         "sales team meeting handshake",
+    "productivity":  "productive person desk focus",
+    "remote":        "remote work home office setup",
+    "startup":       "startup team office brainstorm",
+    "small business":"small business owner laptop",
+    "ecommerce":     "ecommerce online shopping laptop",
+    "invoice":       "business finance accounting",
+    "payment":       "business finance accounting",
+    "customer":      "customer service support",
+    "chatbot":       "artificial intelligence chat",
+    "data":          "data analytics dashboard charts",
+    "spreadsheet":   "spreadsheet data analysis laptop",
+    "default":       "productive business workspace laptop",
+}
+
+# Hardcoded curated URLs as final fallback — verified working, no API needed
+# One unique image per category so articles don't all look the same
+CURATED_FALLBACKS = {
+    "workflow automation dashboard":        "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
+    "productivity workspace desk":          "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1200&q=80",
+    "project management team":              "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=1200&q=80",
+    "sales team office meeting":            "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&q=80",
+    "email marketing laptop":               "https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=1200&q=80",
+    "person writing laptop coffee":         "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1200&q=80",
+    "artificial intelligence technology":   "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1200&q=80",
+    "freelancer working laptop home":       "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80",
+    "calendar planning desk":               "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=1200&q=80",
+    "digital marketing analytics chart":    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80",
+    "productive person desk focus":         "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1200&q=80",
+    "remote work home office setup":        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+    "small business owner laptop":          "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
+    "data analytics dashboard charts":      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
+    "productive business workspace laptop": "https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&q=80",
+}
+
+def _get_visual_query(topic: str) -> str:
+    """Map article topic/keyword to a generic visual search query with real results."""
+    t = topic.lower()
+    for key, query in TOPIC_SEARCH_QUERIES.items():
+        if key != "default" and key in t:
+            return query
+    return TOPIC_SEARCH_QUERIES["default"]
+
+def _curated_fallback(visual_query: str) -> str:
+    """Return a curated image URL for a visual query. Deterministic — same query = same image."""
+    if visual_query in CURATED_FALLBACKS:
+        return CURATED_FALLBACKS[visual_query]
+    # Picsum with seed from query hash — consistent per topic
+    seed = abs(hash(visual_query)) % 1000
+    return f"https://picsum.photos/seed/{seed}/1200/630"
 
 def get_image(topic: str) -> str:
-    global _img_i
+    """
+    Returns a relevant image URL for the article topic.
+
+    Pipeline:
+      1. Unsplash API  — searches a generic visual query (NOT the keyword)
+      2. Pexels API    — same approach, instant free approval at pexels.com/api
+      3. Curated map   — hardcoded verified URLs by visual category, no API
+      4. Picsum        — deterministic random photo, always works, no API
+
+    NEVER searches the raw keyword — "zapier vs n8n" → "workflow automation dashboard"
+    """
+    visual_query = _get_visual_query(topic)
+
+    # 1. Unsplash API
     if UNSPLASH_KEY:
         try:
-            r = requests.get("https://api.unsplash.com/search/photos",
-                params={"query": topic, "per_page": 1, "orientation": "landscape"},
-                headers={"Authorization": f"Client-ID {UNSPLASH_KEY}"}, timeout=10)
-            res = r.json().get("results", [])
-            if res: return res[0]["urls"]["regular"]
+            r = requests.get(
+                "https://api.unsplash.com/search/photos",
+                params={"query": visual_query, "per_page": 3, "orientation": "landscape"},
+                headers={"Authorization": f"Client-ID {UNSPLASH_KEY}"},
+                timeout=10,
+            )
+            results = r.json().get("results", [])
+            if results:
+                # Pick deterministically by topic hash so same topic = same image
+                idx = abs(hash(topic)) % len(results)
+                return results[idx]["urls"]["regular"]
         except Exception:
             pass
-    img = FALLBACKS[_img_i % len(FALLBACKS)]; _img_i += 1
-    return img
+
+    # 2. Pexels API
+    if PEXELS_KEY:
+        try:
+            r = requests.get(
+                "https://api.pexels.com/v1/search",
+                params={"query": visual_query, "per_page": 3, "orientation": "landscape"},
+                headers={"Authorization": PEXELS_KEY},
+                timeout=10,
+            )
+            photos = r.json().get("photos", [])
+            if photos:
+                idx = abs(hash(topic)) % len(photos)
+                return photos[idx]["src"]["large2x"]
+        except Exception:
+            pass
+
+    # 3. Curated verified fallback
+    return _curated_fallback(visual_query)
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def slugify(t: str) -> str:

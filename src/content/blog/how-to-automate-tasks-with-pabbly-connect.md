@@ -1,4 +1,13 @@
 ---
+title: "How To Automate Tasks With Pabbly Connect"
+description: "A guide to how to automate tasks with pabbly connect."
+pubDate: 2026-05-22
+tags: ["ai tools", "small business"]
+affiliate: ""
+affiliateUrl: ""
+amazonProducts: []
+---
+---
 title: "how to automate tasks with pabbly connect — Complete Guide [2026]"
 description: "Learn how to automate tasks with Pabbly Connect and boost productivity, including step-by-step instructions and pricing as of 2026"
 pubDate: 2026-05-22

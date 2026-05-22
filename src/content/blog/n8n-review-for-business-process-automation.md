@@ -1,4 +1,6 @@
 ---
+
+
 title: "n8n review for business process automation — Complete Guide [2026]"
 description: "Discover the best business process automation tools, including n8n, to streamline your workflow and boost productivity with our expert review and comparison."
 pubDate: 2026-05-22
@@ -7,21 +9,8 @@ tags: ["ai tools", "small business", "productivity"]
 image: "https://example.com/automation-tools.jpg"
 affiliate: "various tools"
 affiliateUrl: "#"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Deep Work — Cal Newport"
-    price: "₹349"
-    url:   "https://www.amazon.in/dp/B07YWMFLHK?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+amazonProducts: []
 ---
-
 As a small business owner, you're likely struggling to find the right tools to automate your business processes, saving you time and money in the long run. With so many options available, it can be overwhelming to choose the best one for your needs. In this article, we'll provide a comprehensive review of business process automation tools, including n8n, to help you make an informed decision.
 
 When it comes to business process automation, there are many tools to choose from, each with its own strengths and weaknesses. To help you compare the different options, we've put together a pricing table for some of the most popular tools:

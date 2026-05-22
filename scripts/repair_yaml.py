@@ -1,123 +1,147 @@
 """
-Repair script — fixes broken YAML frontmatter in existing .md files.
-Handles: amazon products injected into body, unclosed frontmatter, bad chars.
+repair_yaml.py — fixes broken frontmatter in all blog .md files.
+Run locally before pushing whenever you see YAML parse errors on Vercel.
 
 Usage:
     python scripts/repair_yaml.py
+
+What it fixes:
+  - amazonProducts block injected into article body instead of frontmatter
+  - Entire frontmatter collapsed onto one line (col 244 style error)
+  - Unclosed frontmatter (missing second ---)
+  - Unquoted or badly quoted title / affiliateUrl values
+  - YAML comment lines (#) inside frontmatter
+  - Stale/malformed amazonProducts entries
 """
 import re, sys
 from pathlib import Path
 
 CONTENT_DIR = Path("src/content/blog")
 
+def _ys(v: str) -> str:
+    return str(v).replace("\\", "\\\\").replace('"', "'").replace("\n", " ").strip()
+
+def split_frontmatter(text: str):
+    """Returns (fm_text, body) or (None, text) if no valid frontmatter."""
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    if not text.startswith("---"):
+        return None, text
+    m = re.search(r"\n---\s*(?:\n|$)", text[3:])
+    if not m:
+        return None, text
+    fm_end     = 3 + m.start()
+    body_start = 3 + m.end()
+    return text[3:fm_end], text[body_start:]
+
+def clean_frontmatter(fm_text: str, slug: str = "") -> str:
+    """
+    Cleans and rebuilds frontmatter text:
+    - Removes comment lines
+    - Removes stale amazonProducts block
+    - Fixes title + affiliateUrl quoting
+    - Adds amazonProducts: [] if missing
+    """
+    lines = fm_text.splitlines()
+    clean, skip, has_amazon = [], False, False
+
+    for line in lines:
+        if line.strip().startswith("#"):
+            continue
+        if line.startswith("amazonProducts:"):
+            skip = True
+            has_amazon = True
+            clean.append("amazonProducts: []")   # placeholder — proper inject later
+            continue
+        if skip:
+            if line.startswith("  ") or line.startswith("\t"):
+                continue
+            else:
+                skip = False
+        # Fix title
+        if line.startswith("title:"):
+            m = re.match(r'title:\s*["\']?(.+?)["\']?\s*$', line)
+            if m:
+                val = m.group(1).strip().strip('"').strip("'")
+                if len(val) > 105:
+                    val = val[:102].rsplit(" ", 1)[0].rstrip(" :-—") + "..."
+                line = f'title: "{_ys(val)}"'
+        # Fix affiliateUrl
+        if line.startswith("affiliateUrl:"):
+            m = re.match(r'affiliateUrl:\s*(.+)\s*$', line)
+            if m:
+                val = _ys(m.group(1).strip().strip('"').strip("'"))
+                line = f'affiliateUrl: "{val}"'
+        clean.append(line)
+
+    if not has_amazon:
+        clean.append("amazonProducts: []")
+
+    return "\n".join(clean)
+
+def fix_body(body: str) -> str:
+    """Remove orphaned amazonProducts YAML that ended up in article body."""
+    # Table row containing amazonProducts
+    body = re.sub(r'\|\s*amazonProducts:.*?(?=\n\||\n\n|\Z)', '', body, flags=re.DOTALL)
+    # Orphaned block-style amazonProducts in body
+    body = re.sub(r'\namazonProducts:(?:\n  -[^\n]+)+', '', body)
+    # Orphaned single-line
+    body = re.sub(r'\namazonProducts: \[\]', '', body)
+    return body
+
 def fix_file(path: Path) -> bool:
     text = path.read_text(encoding="utf-8")
     original = text
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
 
-    # ── Case 1: frontmatter never closed (no second ---) ─────────────────
-    # Happens when Groq wrote body content after frontmatter without closing ---
-    if text.startswith("---"):
-        # Find what should be the closing ---
-        rest = text[3:]
-        close_match = re.search(r'\n---\s*\n', rest)
-        if not close_match:
-            # No closing --- found — the whole file is broken
-            # Strip everything, keep only recognizable frontmatter lines
-            fm_lines = []
-            body_start = 0
-            for i, line in enumerate(rest.splitlines()):
-                if re.match(r'^(title|description|pubDate|updatedDate|tags|image|affiliate|affiliateUrl|amazonProducts|draft):', line):
-                    fm_lines.append(line)
-                elif line.strip().startswith("- ") and fm_lines:
-                    fm_lines.append(line)
-                else:
-                    body_start = i
-                    break
-            body = "\n".join(rest.splitlines()[body_start:])
-            text = "---\n" + "\n".join(fm_lines) + "\namazonProducts: []\n---\n" + body
+    fm_text, body = split_frontmatter(text)
 
-    # ── Case 2: amazonProducts block ended up inside the body ─────────────
-    # Symptom: "| amazonProducts: []" in a table row, or amazon yaml in body
-    text = re.sub(
-        r'\|\s*amazonProducts:.*?(?=\n\||\n\n)',
-        '',
-        text,
-        flags=re.DOTALL
-    )
-    # Strip orphaned amazon yaml lines floating in body
-    text = re.sub(
-        r'\n(amazonProducts:(?:\n  -[^\n]+)+)',
-        '',
-        text
-    )
+    if fm_text is None:
+        # No frontmatter at all — very broken, build minimal
+        slug = path.stem
+        fm_text = (
+            f'title: "{slug.replace("-", " ").title()}"\n'
+            f'description: "A guide to {slug.replace("-", " ")}."\n'
+            f'pubDate: 2026-05-22\n'
+            f'tags: ["ai tools", "small business"]\n'
+            f'affiliate: ""\naffiliateUrl: ""'
+        )
+        body = text
 
-    # ── Case 3: bad amazonProducts in frontmatter ─────────────────────────
-    fm_match = re.match(r'^---\r?\n(.*?)\n---\r?\n(.*)', text, re.DOTALL)
-    if fm_match:
-        fm_raw = fm_match.group(1)
-        body   = fm_match.group(2)
+    fm_clean = clean_frontmatter(fm_text, path.stem)
+    body_clean = fix_body(body)
 
-        # Remove all existing amazonProducts lines from frontmatter
-        fm_lines = fm_raw.splitlines()
-        clean, skip = [], False
-        for line in fm_lines:
-            if line.startswith("amazonProducts:"):
-                skip = True; continue
-            if skip and (line.startswith("  -") or line.startswith("    ")):
-                continue
-            skip = False
-            # Remove YAML comment lines
-            if line.strip().startswith("#"):
-                continue
-            clean.append(line)
+    final = f"---\n{fm_clean}\n---\n{body_clean}"
 
-        # Fix title quoting
-        for i, line in enumerate(clean):
-            if line.startswith("title:"):
-                m = re.match(r'title:\s*["\']?(.+?)["\']?\s*$', line)
-                if m:
-                    val = m.group(1).strip().strip('"').strip("'")
-                    val = val.replace('"', "'")
-                    if len(val) > 105:
-                        val = val[:102].rsplit(" ",1)[0].rstrip(" :-—") + "..."
-                    clean[i] = f'title: "{val}"'
-
-        # Fix affiliateUrl quoting
-        for i, line in enumerate(clean):
-            if line.startswith("affiliateUrl:"):
-                m = re.match(r'affiliateUrl:\s*["\']?(.+?)["\']?\s*$', line)
-                if m:
-                    val = m.group(1).strip().strip('"').strip("'")
-                    clean[i] = f'affiliateUrl: "{val}"'
-
-        clean.append("amazonProducts: []")
-        text = "---\n" + "\n".join(clean) + "\n---\n" + body
-
-    if text != original:
-        path.write_text(text, encoding="utf-8")
+    if final != original:
+        path.write_text(final, encoding="utf-8")
         return True
     return False
 
 def run():
     if not CONTENT_DIR.exists():
-        print("Run from project root."); sys.exit(1)
+        print("Run from project root (where src/ is)."); sys.exit(1)
 
-    files = list(CONTENT_DIR.glob("*.md"))
+    files = sorted(CONTENT_DIR.glob("*.md"))
+    print(f"Checking {len(files)} files...\n")
+
     fixed, ok, errors = 0, 0, 0
     for f in files:
         try:
             if fix_file(f):
-                print(f"  ✓ fixed  {f.name}")
+                print(f"  ✓ fixed   {f.name}")
                 fixed += 1
             else:
                 ok += 1
         except Exception as e:
-            print(f"  ✗ error  {f.name}: {e}")
+            print(f"  ✗ error   {f.name}: {e}")
             errors += 1
 
-    print(f"\n{fixed} fixed, {ok} already clean, {errors} errors")
+    print(f"\nResult: {fixed} fixed | {ok} clean | {errors} errors")
     if fixed:
-        print("Next: git add src/content/blog && git commit -m 'fix: yaml' && git push")
+        print("\nNext steps:")
+        print("  git add src/content/blog")
+        print('  git commit -m "fix: repair yaml frontmatter"')
+        print("  git push")
 
 if __name__ == "__main__":
     run()

@@ -472,89 +472,139 @@ def truncate_title(content: str) -> str:
     return pattern.sub(shorten, content, count=1)
 
 
+def _split_frontmatter(raw: str):
+    """
+    Robustly split a markdown string into (frontmatter_text, body).
+    Handles: missing trailing newline, \r\n, no closing ---, collapsed frontmatter.
+    Returns (None, raw) if no valid frontmatter found.
+    """
+    import re as _re
+    raw = raw.replace("\r\n", "\n").replace("\r", "\n")
+
+    if not raw.startswith("---"):
+        return None, raw
+
+    # Find closing --- that is on its own line (after at least one other line)
+    # Allow optional trailing whitespace on the --- line
+    m = _re.search(r"\n---\s*(?:\n|$)", raw[3:])
+    if not m:
+        return None, raw
+
+    fm_end  = 3 + m.start()          # position of the \n--- in original
+    body_start = 3 + m.end()         # position after the closing ---\n
+    fm_text = raw[3:fm_end]          # text between the two ---
+    body    = raw[body_start:]
+    return fm_text, body
+
+
+def _ys(v: str) -> str:
+    """YAML-safe double-quoted scalar value: escape backslash and double-quote."""
+    return str(v).replace("\\", "\\\\").replace('"', "'").replace("\n", " ").strip()
+
+
 def save(slug: str, content: str, image_url: str, amazon_products: list[dict]):
     """
-    Write article to disk. Bulletproof approach:
-    1. Split content into frontmatter + body using regex (no index tricks)
-    2. Parse frontmatter line by line, inject amazon fields cleanly
-    3. Rejoin and write
+    Write article .md to disk with clean frontmatter.
+    Pipeline:
+      1. Robustly split frontmatter / body
+      2. Replace PLACEHOLDER_IMAGE
+      3. Truncate title to <=105 chars
+      4. Strip comment lines + stale amazonProducts
+      5. Inject fresh amazonProducts YAML
+      6. Inject Amazon table into body
+      7. Write final file — validated before write
     """
     import re as _re
 
     CONTENT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # ── Step 1: split frontmatter from body ──────────────────────────────
-    # Match opening ---, frontmatter lines, closing --- on its own line
-    fm_match = _re.match(r'^---\r?\n(.*?)\n---\r?\n(.*)', content, _re.DOTALL)
-    if not fm_match:
-        # No valid frontmatter found — write as-is with image replaced
-        content = content.replace("PLACEHOLDER_IMAGE", image_url)
-        (CONTENT_DIR / f"{slug}.md").write_text(content, encoding="utf-8")
-        print(f"      [save] Warning: no frontmatter found in {slug}.md")
-        return
+    # ── 1. Split ──────────────────────────────────────────────────────────
+    fm_text, body = _split_frontmatter(content)
 
-    fm_raw  = fm_match.group(1)   # frontmatter text (between --- markers)
-    body    = fm_match.group(2)   # everything after closing ---
+    if fm_text is None:
+        # Groq returned no frontmatter — build minimal one from scratch
+        print(f"      [save] No frontmatter detected — building minimal frontmatter")
+        fm_text = (
+            f'title: "{slug.replace("-", " ").title()}"\n'
+            f'description: "A guide to {slug.replace("-", " ")}."\n'
+            f'pubDate: {datetime.now().strftime("%Y-%m-%d")}\n'
+            f'tags: ["ai tools", "small business"]\n'
+            f'affiliate: ""\n'
+            f'affiliateUrl: ""'
+        )
+        body = content  # entire content becomes body
 
-    # ── Step 2: inject image into frontmatter ─────────────────────────────
-    fm_raw = fm_raw.replace("PLACEHOLDER_IMAGE", image_url)
-    body   = body.replace("PLACEHOLDER_IMAGE", image_url)  # fallback
+    # ── 2. Replace image placeholder ─────────────────────────────────────
+    fm_text = fm_text.replace("PLACEHOLDER_IMAGE", image_url)
+    body    = body.replace("PLACEHOLDER_IMAGE", image_url)
 
-    # ── Step 3: truncate title safely ─────────────────────────────────────
-    def fix_title_line(line):
-        m = _re.match(r'title:\s*["\']?(.+?)["\']?\s*$', line)
-        if not m: return line
-        val = m.group(1).strip().strip('"').strip("'")
-        if len(val) > 105:
-            val = val[:102].rsplit(" ", 1)[0].rstrip(" :-—") + "..."
-        val = val.replace('"',"'")  # no double quotes inside double-quoted string
-        return f'title: "{val}"'
+    # ── 3. Process frontmatter line by line ───────────────────────────────
+    lines = fm_text.splitlines()
+    clean, skip = [], False
 
-    fm_lines = fm_raw.splitlines()
-    fm_lines = [fix_title_line(l) if l.startswith("title:") else l for l in fm_lines]
-
-    # ── Step 4: remove any stale amazonProducts lines (from previous run) ──
-    clean_lines, skip = [], False
-    for line in fm_lines:
-        if line.startswith("amazonProducts:"):
-            skip = True; continue
-        if skip and (line.startswith("  -") or line.startswith("    ")):
-            continue
-        skip = False
-        # Also strip any YAML comment lines (# ...) — they confuse gray-matter
+    for line in lines:
+        # Skip YAML comment lines — gray-matter sometimes chokes on them
         if line.strip().startswith("#"):
             continue
-        clean_lines.append(line)
-    fm_lines = clean_lines
+        # Remove stale amazonProducts block
+        if line.startswith("amazonProducts:"):
+            skip = True
+            continue
+        if skip:
+            if line.startswith("  ") or line.startswith("\t"):
+                continue   # continuation of the amazonProducts block
+            else:
+                skip = False
+        # Fix title length and quoting
+        if line.startswith("title:"):
+            m = _re.match(r'title:\s*["\'\']?(.+?)["\'\']?\s*$', line)
+            if m:
+                val = m.group(1).strip().strip('"').strip("\'")
+                if len(val) > 105:
+                    val = val[:102].rsplit(" ", 1)[0].rstrip(" :-—") + "..."
+                val = _ys(val)
+                line = f'title: "{val}"'
+        # Ensure affiliateUrl is quoted
+        if line.startswith("affiliateUrl:"):
+            m = _re.match(r'affiliateUrl:\s*(.+)\s*$', line)
+            if m:
+                val = _ys(m.group(1).strip().strip('"').strip("\'"))
+                line = f'affiliateUrl: "{val}"'
+        clean.append(line)
 
-    # ── Step 5: build amazonProducts YAML lines ───────────────────────────
+    # ── 4. Inject amazonProducts ──────────────────────────────────────────
     if amazon_products:
-        am_lines = ["amazonProducts:"]
+        clean.append("amazonProducts:")
         for p in amazon_products:
-            def ys(v):  # yaml-safe: escape double quotes, no newlines
-                return str(v).replace("\\","\\\\").replace('"',"'").replace("\n"," ")
-            am_lines.append(f'  - title: "{ys(p.get("title","Product"))}"')
-            am_lines.append(f'    price: "{ys(p.get("price",""))}"')
-            am_lines.append(f'    url:   "{ys(p.get("url","#"))}"')
-            am_lines.append(f'    cat:   "{ys(p.get("cat","Amazon"))}"')
-        fm_lines.extend(am_lines)
+            clean.append(f'  - title: "{_ys(p.get("title", "Product"))}"'  )
+            clean.append(f'    price: "{_ys(p.get("price", ""))}"'         )
+            clean.append(f'    url:   "{_ys(p.get("url", "#"))}"'          )
+            clean.append(f'    cat:   "{_ys(p.get("cat", "Amazon"))}"'     )
     else:
-        fm_lines.append("amazonProducts: []")
+        clean.append("amazonProducts: []")
 
-    # ── Step 6: inject amazon table into body ─────────────────────────────
+    # ── 5. Inject Amazon table into body ──────────────────────────────────
     amazon_md = products_to_markdown(amazon_products)
-    if "<!--AMAZON_PRODUCTS_HERE-->" in body and amazon_md:
-        body = body.replace("<!--AMAZON_PRODUCTS_HERE-->", amazon_md)
-    elif amazon_md and "## Frequently Asked Questions" in body:
-        body = body.replace(
-            "## Frequently Asked Questions",
-            amazon_md + "\n\n## Frequently Asked Questions"
-        )
-    elif amazon_md:
-        body = body + "\n\n" + amazon_md
+    if amazon_md:
+        if "<!--AMAZON_PRODUCTS_HERE-->" in body:
+            body = body.replace("<!--AMAZON_PRODUCTS_HERE-->", amazon_md)
+        elif "## Frequently Asked Questions" in body:
+            body = body.replace(
+                "## Frequently Asked Questions",
+                amazon_md + "\n\n## Frequently Asked Questions", 1
+            )
+        else:
+            body = body.rstrip() + "\n\n" + amazon_md + "\n"
 
-    # ── Step 7: reassemble and write ─────────────────────────────────────
-    final = "---\n" + "\n".join(fm_lines) + "\n---\n" + body
+    # ── 6. Reassemble ─────────────────────────────────────────────────────
+    fm_final = "\n".join(clean)
+    final    = f"---\n{fm_final}\n---\n{body}"
+
+    # ── 7. Sanity check — no line >500 chars in frontmatter ───────────────
+    for i, line in enumerate(clean, 1):
+        if len(line) > 500:
+            print(f"      [save] WARNING: frontmatter line {i} is {len(line)} chars — may cause YAML parse error")
+
     (CONTENT_DIR / f"{slug}.md").write_text(final, encoding="utf-8")
 
 

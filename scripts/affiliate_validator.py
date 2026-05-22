@@ -29,6 +29,7 @@ sb = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Your affiliate link patterns — customize these
 AFFILIATE_PATTERNS = [
+    # SaaS programs
     r"https://zapier\.com\?via=\w+",
     r"https://notion\.so/affiliates/\w+",
     r"https://clickup\.com\?fp_ref=\w+",
@@ -36,6 +37,11 @@ AFFILIATE_PATTERNS = [
     r"https://monday\.com/\?r=\w+",
     r"https://calendly\.com/pages/pricing\?ref=\w+",
     r"https://www\.hubspot\.com/\?hubs_signup-url=\w+",
+    r"https://airtable\.com/invite/r/\w+",
+    r"https://www\.pipedrive\.com/en/invite/\w+",
+    r"https://www\.grammarly\.com/referrals/\w+",
+    # Amazon Associates tag links
+    r"https://www\.amazon\.(in|com|co\.uk)/dp/[A-Z0-9]+\?tag=[\w-]+",
 ]
 
 def extract_links_from_file(filepath: Path) -> list[str]:

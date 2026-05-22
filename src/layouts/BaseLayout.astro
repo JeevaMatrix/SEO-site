@@ -24,7 +24,9 @@ const {
 } = Astro.props;
 
 const siteName = 'AI Tools Idea';
-const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+// Truncate to 60 chars for SEO before appending site name
+const seoTitle   = title.length > 60 ? title.slice(0, 57).trimEnd() + '...' : title;
+const fullTitle  = seoTitle.includes(siteName) ? seoTitle : `${seoTitle} | ${siteName}`;
 ---
 
 <!DOCTYPE html>
@@ -53,6 +55,11 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
   <meta property="og:locale"      content="en_US" />
 
   <!-- Twitter -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:site"        content="@aitoolsidea" />
+  <meta name="twitter:title"       content={fullTitle} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image"       content={new URL(image, Astro.site).toString()} />
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -68,13 +75,13 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DLX2GXXTXN"></script>
+  <!-- Google Analytics (replace G-XXXXXXXXXX) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-DLX2GXXTXN');
+    gtag('config', 'G-XXXXXXXXXX');
     // Track affiliate clicks
     document.addEventListener('click', e => {
       const a = e.target.closest('a');

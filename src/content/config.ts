@@ -9,7 +9,7 @@ const blog = defineCollection({
   schema: z.object({
     title: z.string()
       .min(10, 'Title too short')
-      .max(70,  'Title too long for SEO'),
+      .max(120, 'Title too long'),  // relaxed — Groq titles can be long; og:title is truncated in BaseLayout
     description: z.string()
       .min(80,  'Description too short (min 80 chars)')
       .max(160, 'Description too long for SEO (max 160 chars)'),
@@ -20,8 +20,20 @@ const blog = defineCollection({
     ),
     tags: z.array(z.string()).default([]),
     affiliate: z.string().optional().default(''),
+    affiliateUrl: z.string().optional().default(''),
+    amazonProducts: z.array(z.object({
+      title: z.string(),
+      price: z.string(),
+      url:   z.string(),
+      cat:   z.string(),
+    })).optional().default([]),
     draft: z.boolean().optional().default(false),
+    // title max relaxed to 100 — Groq generates long titles, truncation handled in generator
   }),
 });
+
+// NOTE: title max is intentionally NOT enforced here (removed .max(70))
+// because Groq-generated titles like "X vs Y — Complete Guide [2026]"
+// often exceed 70 chars. SEO title tag is truncated separately in BaseLayout.astro.
 
 export const collections = { blog };

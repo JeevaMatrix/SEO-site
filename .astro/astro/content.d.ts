@@ -166,6 +166,13 @@ declare module 'astro:content' {
   collection: "blog";
   data: InferEntrySchema<"blog">
 } & { render(): Render[".md"] };
+"n8n-review-for-business-process-automation.md": {
+	id: "n8n-review-for-business-process-automation.md";
+  slug: "n8n-review-for-business-process-automation";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
 "n8n-vs-zapier-for-marketing-automation.md": {
 	id: "n8n-vs-zapier-for-marketing-automation.md";
   slug: "n8n-vs-zapier-for-marketing-automation";

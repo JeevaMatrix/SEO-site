@@ -3,6 +3,20 @@
 // Premium article layout — fixes FAQ schema rendering as visible text
 // Extracts <!-- FAQ_SCHEMA_START --> blocks and injects as proper <script> tags
 import BaseLayout from './BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// ── Related posts ─────────────────────────────────────────────────────────
+// Fetch at build time — 3 posts sharing at least 1 tag, excluding current
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const currentSlug = Astro.url.pathname.replace(/\/blog\//, '').replace(/\/$/, '');
+const related = allPosts
+  .filter(p => {
+    if (p.slug === currentSlug) return false;
+    const currentTags: string[] = Astro.props.tags ?? [];
+    return p.data.tags?.some((t: string) => currentTags.includes(t));
+  })
+  .sort(() => Math.random() - 0.5)   // shuffle so it varies
+  .slice(0, 3);
 
 interface Props {
   title: string;
@@ -12,6 +26,8 @@ interface Props {
   image?: string;
   tags?: string[];
   affiliate?: string;
+  affiliateUrl?: string;
+  amazonProducts?: Array<{title: string; price: string; url: string; cat: string}>;
 }
 
 const {
@@ -22,6 +38,8 @@ const {
   image = 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&q=80',
   tags = [],
   affiliate = '',
+  affiliateUrl = '',
+  amazonProducts = [],
 } = Astro.props;
 
 function getCategoryFallback(tags = []) {
@@ -238,18 +256,37 @@ const breadcrumbSchema = {
           <nav class="toc-nav" id="toc-nav" aria-label="Table of contents"></nav>
         </div>
 
-        <!-- Quick verdict -->
-        {affiliate && (
+        <!-- Quick verdict — SaaS affiliate -->
+        {affiliate && affiliateUrl && affiliateUrl !== '#' && (
           <div class="sidebar-card verdict-card">
             <div class="verdict-label">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--c-amber)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              Our top pick
+              Top Pick
             </div>
             <p class="verdict-tool">{affiliate}</p>
-            <a href="#" class="btn btn--primary verdict-btn">
+            <a href={affiliateUrl} class="btn btn--primary verdict-btn" target="_blank" rel="noopener sponsored">
               Try {affiliate} free →
             </a>
-            <p class="verdict-note">No credit card required</p>
+            <p class="verdict-note">Affiliate link — no extra cost to you</p>
+          </div>
+        )}
+
+        <!-- Amazon product cards (populated from frontmatter at build time) -->
+        {amazonProducts.length > 0 && (
+          <div class="sidebar-card amazon-card">
+            <p class="sidebar-card-title">📦 Recommended on Amazon</p>
+            <ul class="amazon-product-list">
+              {amazonProducts.map((p) => (
+                <li class="amazon-product-item">
+                  <a href={p.url} target="_blank" rel="noopener sponsored" class="amazon-product-link">
+                    <span class="amazon-product-cat">{p.cat}</span>
+                    <span class="amazon-product-title">{p.title}</span>
+                    <span class="amazon-product-price">{p.price} <span class="amazon-cta">View →</span></span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <p class="amazon-disc">Affiliate links — same price for you</p>
           </div>
         )}
 
@@ -257,6 +294,43 @@ const breadcrumbSchema = {
     </div>
 
   </div>
+
+  <!-- ── Related Posts ──────────────────────────────────────────────── -->
+  {related.length > 0 && (
+    <section class="related-posts">
+      <div class="container">
+        <h2 class="related-title">Keep Reading</h2>
+        <div class="related-grid">
+          {related.map((post) => (
+            <a href={`/blog/${post.slug}/`} class="related-card">
+              {post.data.image && (
+                <div class="related-card-img-wrap">
+                  <img
+                    src={post.data.image}
+                    alt={post.data.title}
+                    class="related-card-img"
+                    loading="lazy"
+                    decoding="async"
+                    width="400"
+                    height="220"
+                  />
+                </div>
+              )}
+              <div class="related-card-body">
+                {post.data.tags?.[0] && (
+                  <span class="related-card-tag">{post.data.tags[0]}</span>
+                )}
+                <h3 class="related-card-title">{post.data.title}</h3>
+                <p class="related-card-desc">{post.data.description?.slice(0, 100)}…</p>
+                <span class="related-card-cta">Read article →</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
 </BaseLayout>
 
 <!-- ═══ FAQ SCHEMA FIX ════════════════════════════════════════════════════
@@ -591,5 +665,159 @@ const breadcrumbSchema = {
     .article-hero { padding: var(--space-8) 0 var(--space-6); }
     .newsletter-cta-inner { flex-direction: column; align-items: flex-start; }
     .newsletter-cta .btn { margin-left: 0; width: 100%; justify-content: center; }
+  }
+
+  /* ── FAQ section styling ────────────────────────────── */
+  .prose h2:has(+ h3) { margin-bottom: var(--space-3); }
+  .prose #frequently-asked-questions ~ h3,
+  .prose h2 + h3 {
+    background: var(--c-bg2);
+    border: 1px solid var(--c-border);
+    border-left: 3px solid var(--c-amber);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    font-size: 0.95rem;
+    margin-top: var(--space-5);
+  }
+  /* Hide raw FAQ JSON if JS hasn't cleaned it yet */
+  .faq-schema-raw { display: none !important; }
+
+  /* ── Amazon sidebar cards ────────────────────────────── */
+  .amazon-card { padding-bottom: var(--space-3); }
+  .amazon-product-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .amazon-product-item { border-bottom: 1px solid var(--c-border); }
+  .amazon-product-item:last-child { border-bottom: none; }
+  .amazon-product-link {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-2) 0;
+    text-decoration: none;
+    color: inherit;
+  }
+  .amazon-product-link:hover .amazon-product-title { color: #ff9900; }
+  .amazon-product-cat {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #ff9900;
+  }
+  .amazon-product-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--c-white);
+    line-height: 1.35;
+    transition: color var(--dur-fast);
+  }
+  .amazon-product-price {
+    font-size: 0.8rem;
+    color: var(--c-text-2);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .amazon-cta {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ff9900;
+    margin-left: auto;
+  }
+  .amazon-disc {
+    font-size: 0.68rem;
+    color: var(--c-text-3);
+    margin: 0;
+    text-align: center;
+  }
+
+  /* ── Related Posts ───────────────────────────────────── */
+  .related-posts {
+    border-top: 1px solid var(--c-border);
+    padding: var(--space-12) 0 var(--space-16);
+    margin-top: var(--space-8);
+  }
+  .related-title {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--c-white);
+    margin-bottom: var(--space-6);
+    text-align: center;
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-5);
+  }
+  .related-card {
+    background: var(--c-bg2);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--dur-fast), transform var(--dur-fast);
+    display: flex;
+    flex-direction: column;
+  }
+  .related-card:hover {
+    border-color: var(--c-amber);
+    transform: translateY(-2px);
+  }
+  .related-card-img-wrap { aspect-ratio: 16/9; overflow: hidden; }
+  .related-card-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .related-card:hover .related-card-img { transform: scale(1.04); }
+  .related-card-body {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    flex: 1;
+  }
+  .related-card-tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-amber);
+  }
+  .related-card-title {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--c-white);
+    line-height: 1.4;
+    margin: 0;
+  }
+  .related-card-desc {
+    font-size: 0.8rem;
+    color: var(--c-text-3);
+    line-height: 1.5;
+    margin: 0;
+    flex: 1;
+  }
+  .related-card-cta {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--c-amber);
+    margin-top: var(--space-2);
+  }
+  @media (max-width: 768px) {
+    .related-grid { grid-template-columns: 1fr; }
+  }
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .related-grid { grid-template-columns: repeat(2, 1fr); }
+    .related-grid > *:last-child { display: none; }
   }
 </style>

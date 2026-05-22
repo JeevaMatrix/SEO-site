@@ -1,67 +1,158 @@
 name: Auto-marketing on publish
-# Runs after content-generator pushes new articles
-# 1. Pings IndexNow (instant Google/Bing indexing request)
-# 2. Pings Bing Webmaster API
-# 3. Posts to social via IFTTT webhook (optional)
+
+# Triggers when content-generator bot pushes new articles
+# 1. Pings IndexNow → instant Bing + Yandex indexing
+# 2. Posts to Telegram channel
+# 3. Optional Google sitemap ping
 
 on:
   push:
     paths:
-      - 'src/content/blog/**.md'
+      - 'src/content/blog/**/*.md'
   workflow_dispatch:
 
 jobs:
   marketing:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2   # need previous commit to detect new files
 
+    env:
+      SITE_URL: ${{ secrets.SITE_URL }}
+      INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      # ─────────────────────────────────────────────────────────────
+      # Detect newly added/changed markdown blog posts
+      # ─────────────────────────────────────────────────────────────
       - name: Detect new articles
         id: detect
         run: |
-          NEW=$(git diff --name-only HEAD~1 HEAD -- 'src/content/blog/*.md' | head -10)
-          echo "files=$NEW" >> $GITHUB_OUTPUT
-          # Build URL list from slugs
+          NEW=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} -- 'src/content/blog' | grep '\.md$' | head -10 || true)
+
+          COUNT=$(echo "$NEW" | grep -c '\.md' || echo "0")
+
           URLS=""
           for f in $NEW; do
+            [ -z "$f" ] && continue
             SLUG=$(basename "$f" .md)
-            URLS="$URLS ${{ secrets.SITE_URL }}/blog/$SLUG/"
-          done
-          echo "urls=$URLS" >> $GITHUB_OUTPUT
-          echo "count=$(echo $NEW | wc -w)" >> $GITHUB_OUTPUT
-
-      - name: Ping IndexNow (instant Bing + Yandex indexing)
-        if: steps.detect.outputs.count > 0
-        run: |
-          for URL in ${{ steps.detect.outputs.urls }}; do
-            curl -s -X GET \
-              "https://api.indexnow.org/indexnow?url=$URL&key=${{ secrets.INDEXNOW_KEY }}&keyLocation=${{ secrets.SITE_URL }}/${{ secrets.INDEXNOW_KEY }}.txt" \
-              -o /dev/null -w "IndexNow ping: %{http_code} for $URL\n"
+            URLS="$URLS ${SITE_URL}/blog/${SLUG}/"
           done
 
-      - name: Ping Google Search Console sitemap
+          {
+            echo "files<<EOF"
+            echo "$NEW"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+          {
+            echo "urls<<EOF"
+            echo "$URLS"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+
+          echo "Detected $COUNT article(s)"
+
+      # ─────────────────────────────────────────────────────────────
+      # IndexNow submission
+      # ─────────────────────────────────────────────────────────────
+      - name: Ping IndexNow
         if: steps.detect.outputs.count > 0
         run: |
-          curl -s "https://www.google.com/ping?sitemap=${{ secrets.SITE_URL }}/sitemap-index.xml" \
-            -o /dev/null -w "GSC ping: %{http_code}\n"
-
-      - name: IFTTT social post (optional)
-        if: steps.detect.outputs.count > 0 && secrets.IFTTT_WEBHOOK_KEY != ''
-        run: |
-          # Set up IFTTT applet: Webhook → Twitter/LinkedIn/Buffer
-          # Event name: new_seo_article
-          # Value1 = title, Value2 = URL, Value3 = description
-          FIRST_FILE=$(git diff --name-only HEAD~1 HEAD -- 'src/content/blog/*.md' | head -1)
-          if [ -n "$FIRST_FILE" ]; then
-            SLUG=$(basename "$FIRST_FILE" .md)
-            TITLE=$(grep '^title:' "$FIRST_FILE" | head -1 | sed 's/title: "//;s/"//')
-            DESC=$(grep '^description:' "$FIRST_FILE" | head -1 | sed 's/description: "//;s/"//')
-            URL="${{ secrets.SITE_URL }}/blog/$SLUG/"
-            curl -s -X POST \
-              "https://maker.ifttt.com/trigger/new_seo_article/with/key/${{ secrets.IFTTT_WEBHOOK_KEY }}" \
-              -H "Content-Type: application/json" \
-              -d "{\"value1\":\"$TITLE\",\"value2\":\"$URL\",\"value3\":\"$DESC\"}" \
-              -o /dev/null -w "IFTTT: %{http_code}\n"
+          if [ -z "$INDEXNOW_KEY" ] || [ -z "$SITE_URL" ]; then
+            echo "INDEXNOW_KEY or SITE_URL missing — skipping"
+            exit 0
           fi
+
+          for URL in ${{ steps.detect.outputs.urls }}; do
+            [ -z "$URL" ] && continue
+
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              "https://api.indexnow.org/indexnow?url=${URL}&key=${INDEXNOW_KEY}&keyLocation=${SITE_URL}/${INDEXNOW_KEY}.txt")
+
+            echo "IndexNow: $STATUS → $URL"
+          done
+
+      # ─────────────────────────────────────────────────────────────
+      # Optional Google sitemap ping
+      # ─────────────────────────────────────────────────────────────
+      - name: Ping Google sitemap
+        if: steps.detect.outputs.count > 0
+        run: |
+          if [ -z "$SITE_URL" ]; then
+            echo "SITE_URL missing — skipping"
+            exit 0
+          fi
+
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://www.google.com/ping?sitemap=${SITE_URL}/sitemap-index.xml")
+
+          echo "Google sitemap ping: $STATUS"
+
+      # ─────────────────────────────────────────────────────────────
+      # Telegram auto-post
+      # ─────────────────────────────────────────────────────────────
+      - name: Post to Telegram channel
+        if: steps.detect.outputs.count > 0
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "Telegram not configured — skipping"
+            exit 0
+          fi
+
+          FIRST_FILE=$(echo "${{ steps.detect.outputs.files }}" | head -1)
+
+          if [ -z "$FIRST_FILE" ]; then
+            echo "No file detected"
+            exit 0
+          fi
+
+          SLUG=$(basename "$FIRST_FILE" .md)
+
+          TITLE=$(grep '^title:' "$FIRST_FILE" 2>/dev/null | head -1 | sed 's/title: "//;s/"//' | sed "s/title: '//;s/'//")
+
+          DESC=$(grep '^description:' "$FIRST_FILE" 2>/dev/null | head -1 | sed 's/description: "//;s/"//' | sed "s/description: '//;s/'//")
+
+          URL="${SITE_URL}/blog/${SLUG}/"
+
+          COUNT=${{ steps.detect.outputs.count }}
+
+          if [ "$COUNT" -gt 1 ]; then
+            EXTRA=" (+$((COUNT-1)) more articles published today)"
+          else
+            EXTRA=""
+          fi
+
+          MESSAGE="📝 *New article published${EXTRA}*
+
+          *${TITLE}*
+
+          ${DESC}
+
+          🔗 [Read now](${URL})
+
+          #AITools #SmallBusiness #Automation"
+
+          JSON=$(jq -n \
+            --arg chat_id "$TELEGRAM_CHAT_ID" \
+            --arg text "$MESSAGE" \
+            '{
+              chat_id: $chat_id,
+              text: $text,
+              parse_mode: "Markdown",
+              disable_web_page_preview: false
+            }')
+
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "$JSON")
+
+          echo "Telegram post: $STATUS"

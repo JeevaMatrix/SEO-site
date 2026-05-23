@@ -70,9 +70,9 @@ jobs:
 
           echo "Detected ${COUNT} article(s)"
 
-      # ─────────────────────────────────────────────
+      # ────────────────────────────────────────────
       # Submit URLs to IndexNow
-      # ─────────────────────────────────────────────
+      # ────────────────────────────────────────────
       - name: Ping IndexNow
         if: steps.detect.outputs.count > 0
         shell: bash

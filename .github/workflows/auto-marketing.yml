@@ -1,10 +1,5 @@
 name: Auto-marketing on publish
 
-# Triggers when content-generator bot pushes new articles
-# 1. Pings IndexNow → instant Bing + Yandex indexing
-# 2. Posts to Telegram channel
-# 3. Optional Google sitemap ping
-
 on:
   push:
     paths:
@@ -22,49 +17,65 @@ jobs:
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
     steps:
+      # ─────────────────────────────────────────────
+      # Checkout repository
+      # ─────────────────────────────────────────────
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      # ─────────────────────────────────────────────────────────────
-      # Detect newly added/changed markdown blog posts
-      # ─────────────────────────────────────────────────────────────
+      # ─────────────────────────────────────────────
+      # Detect changed markdown articles
+      # ─────────────────────────────────────────────
       - name: Detect new articles
         id: detect
+        shell: bash
         run: |
-          NEW=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} -- 'src/content/blog' | grep '\.md$' | head -10 || true)
+          set +e
 
-          COUNT=$(echo "$NEW" | grep -c '\.md' || echo "0")
+          NEW=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" -- 'src/content/blog' \
+            | grep '\.md$' \
+            | head -10 || true)
+
+          if [ -z "$NEW" ]; then
+            COUNT=0
+          else
+            COUNT=$(echo "$NEW" | grep -c '\.md' || true)
+            COUNT=${COUNT:-0}
+          fi
 
           URLS=""
+
           for f in $NEW; do
             [ -z "$f" ] && continue
+
             SLUG=$(basename "$f" .md)
             URLS="$URLS ${SITE_URL}/blog/${SLUG}/"
           done
 
           {
-            echo "files<<EOF"
+            echo "files<<FILEEOF"
             echo "$NEW"
-            echo "EOF"
-          } >> $GITHUB_OUTPUT
+            echo "FILEEOF"
+          } >> "$GITHUB_OUTPUT"
 
           {
-            echo "urls<<EOF"
+            echo "urls<<URLEOF"
             echo "$URLS"
-            echo "EOF"
-          } >> $GITHUB_OUTPUT
+            echo "URLEOF"
+          } >> "$GITHUB_OUTPUT"
 
-          echo "count=$COUNT" >> $GITHUB_OUTPUT
+          echo "count=${COUNT}" >> "$GITHUB_OUTPUT"
 
-          echo "Detected $COUNT article(s)"
+          echo "Detected ${COUNT} article(s)"
 
-      # ─────────────────────────────────────────────────────────────
-      # IndexNow submission
-      # ─────────────────────────────────────────────────────────────
+      # ─────────────────────────────────────────────
+      # Submit URLs to IndexNow
+      # ─────────────────────────────────────────────
       - name: Ping IndexNow
         if: steps.detect.outputs.count > 0
+        shell: bash
         run: |
           if [ -z "$INDEXNOW_KEY" ] || [ -z "$SITE_URL" ]; then
             echo "INDEXNOW_KEY or SITE_URL missing — skipping"
@@ -74,33 +85,35 @@ jobs:
           for URL in ${{ steps.detect.outputs.urls }}; do
             [ -z "$URL" ] && continue
 
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            STATUS=$(curl --max-time 15 -s -o /dev/null -w "%{http_code}" \
               "https://api.indexnow.org/indexnow?url=${URL}&key=${INDEXNOW_KEY}&keyLocation=${SITE_URL}/${INDEXNOW_KEY}.txt")
 
-            echo "IndexNow: $STATUS → $URL"
+            echo "IndexNow: ${STATUS} → ${URL}"
           done
 
-      # ─────────────────────────────────────────────────────────────
+      # ─────────────────────────────────────────────
       # Optional Google sitemap ping
-      # ─────────────────────────────────────────────────────────────
+      # ─────────────────────────────────────────────
       - name: Ping Google sitemap
         if: steps.detect.outputs.count > 0
+        shell: bash
         run: |
           if [ -z "$SITE_URL" ]; then
             echo "SITE_URL missing — skipping"
             exit 0
           fi
 
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          STATUS=$(curl --max-time 15 -s -o /dev/null -w "%{http_code}" \
             "https://www.google.com/ping?sitemap=${SITE_URL}/sitemap-index.xml")
 
-          echo "Google sitemap ping: $STATUS"
+          echo "Google sitemap ping: ${STATUS}"
 
-      # ─────────────────────────────────────────────────────────────
-      # Telegram auto-post
-      # ─────────────────────────────────────────────────────────────
+      # ─────────────────────────────────────────────
+      # Post article to Telegram channel
+      # ─────────────────────────────────────────────
       - name: Post to Telegram channel
         if: steps.detect.outputs.count > 0
+        shell: bash
         run: |
           if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
             echo "Telegram not configured — skipping"
@@ -110,27 +123,33 @@ jobs:
           FIRST_FILE=$(echo "${{ steps.detect.outputs.files }}" | head -1)
 
           if [ -z "$FIRST_FILE" ]; then
-            echo "No file detected"
+            echo "No article file detected"
             exit 0
           fi
 
           SLUG=$(basename "$FIRST_FILE" .md)
 
-          TITLE=$(grep '^title:' "$FIRST_FILE" 2>/dev/null | head -1 | sed 's/title: "//;s/"//' | sed "s/title: '//;s/'//")
+          TITLE=$(grep '^title:' "$FIRST_FILE" 2>/dev/null \
+            | head -1 \
+            | sed 's/^title: "//;s/"$//' \
+            | sed "s/^title: '//;s/'$//")
 
-          DESC=$(grep '^description:' "$FIRST_FILE" 2>/dev/null | head -1 | sed 's/description: "//;s/"//' | sed "s/description: '//;s/'//")
+          DESC=$(grep '^description:' "$FIRST_FILE" 2>/dev/null \
+            | head -1 \
+            | sed 's/^description: "//;s/"$//' \
+            | sed "s/^description: '//;s/'$//")
 
           URL="${SITE_URL}/blog/${SLUG}/"
 
           COUNT=${{ steps.detect.outputs.count }}
 
           if [ "$COUNT" -gt 1 ]; then
-            EXTRA=" (+$((COUNT-1)) more articles published today)"
+            EXTRA=" (+$((COUNT-1)) more today)"
           else
             EXTRA=""
           fi
 
-          MESSAGE="📝 *New article published${EXTRA}*
+          MESSAGE="📝 *New article${EXTRA}*
 
           *${TITLE}*
 
@@ -150,9 +169,9 @@ jobs:
               disable_web_page_preview: false
             }')
 
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          STATUS=$(curl --max-time 15 -s -o /dev/null -w "%{http_code}" \
             -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -H "Content-Type: application/json" \
             -d "$JSON")
 
-          echo "Telegram post: $STATUS"
+          echo "Telegram post: ${STATUS}"

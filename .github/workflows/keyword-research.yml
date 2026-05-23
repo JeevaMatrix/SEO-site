@@ -1,21 +1,25 @@
 name: Daily keyword research
 on:
   schedule:
-    - cron: '0 6 * * *'
+    - cron: '0 1 * * *'   # 1:00 AM UTC = 6:30 AM IST — runs before content generator
   workflow_dispatch:
+
 jobs:
   research:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - run: pip install anthropic supabase requests
+
+      - run: pip install requests supabase   # groq is via requests — no anthropic needed
+
       - name: Run keyword research
         env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: python scripts/keyword_research.py

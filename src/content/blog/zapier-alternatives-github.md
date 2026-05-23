@@ -1,5 +1,6 @@
 ---
 
+
 title: "zapier alternatives github — Complete Guide [2026]"
 description: "Discover the best Zapier alternatives on GitHub for small business owners to automate tasks and boost productivity"
 pubDate: 2026-05-23
@@ -8,19 +9,7 @@ tags: ["ai tools", "small business", "productivity"]
 image: "https://cdn.example.com/zapier-alternatives.png"
 affiliate: "Zapier"
 affiliateUrl: "https://zapier.com?via=YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Logitech MX Keys Wireless Keyboard"
-    price: "₹8,995"
-    url:   "https://www.amazon.in/dp/B08N5LNQCX?tag=jeeva0d-20"
-    cat:   "Office Gear"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+amazonProducts: []
 ---
 As a small business owner, you're likely struggling to find the perfect automation tool to streamline your workflow, and you're considering Zapier alternatives on GitHub to help you achieve your goals. With so many options available, it can be overwhelming to decide which one is right for you. In this article, we'll explore the best Zapier alternatives on GitHub, including their features, pricing, and pros and cons.
 

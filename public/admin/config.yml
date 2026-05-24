@@ -1,7 +1,7 @@
 # public/admin/config.yml
 
 backend:
-  name: github
+  name: git-gateway
   repo: JeevaMatrix/SEO-site
   branch: main
   base_url: https://api.netlify.com

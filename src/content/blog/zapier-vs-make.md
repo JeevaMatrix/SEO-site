@@ -1,6 +1,6 @@
 ---
 affiliateUrl: https://zapier.com?via=YOURCODE
-draft: true
+draft: false
 amazonProducts: []
 updatedDate: 2026-05-23
 title: zapier vs make — Complete Guide [2026]

@@ -1,6 +1,6 @@
 ---
 affiliateUrl: https://zapier.com?via=YOURCODE
-draft: true
+draft: false
 amazonProducts: []
 updatedDate: 2026-05-22
 title: Zapier Alternatives for HR Professionals — Complete Guide [2026]

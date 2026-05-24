@@ -1,6 +1,6 @@
 ---
 affiliateUrl: https://zapier.com?via=YOURCODE
-draft: true
+draft: false
 amazonProducts: []
 updatedDate: 2026-05-22
 title: does microsoft have anything similar to zapier — Complete Guide [2026]

@@ -1,6 +1,7 @@
 ---
 
 
+
 title: "notion alternatives for freelancers project management — Complete Guide [2026]"
 description: "Discover the best Notion alternatives for freelancers to boost project management efficiency and productivity in 2026"
 pubDate: 2026-05-23

@@ -1,5 +1,6 @@
 ---
 
+
 title: "notion vs trello for small business productivity — Complete Guide [2026]"
 description: "Compare Notion and Trello for small business productivity, features, and pricing to boost your team's efficiency"
 pubDate: 2026-05-24
@@ -8,19 +9,7 @@ tags: ["ai tools", "small business", "productivity"]
 image: "placeholder-image.jpg"
 affiliate: "Notion"
 affiliateUrl: "https://notion.so/affiliates/YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Logitech MX Keys Wireless Keyboard"
-    price: "₹8,995"
-    url:   "https://www.amazon.in/dp/B08N5LNQCX?tag=jeeva0d-20"
-    cat:   "Office Gear"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+amazonProducts: []
 ---
 As a small business owner, you're likely struggling to find the perfect tool to manage your team's tasks, projects, and workflows, which is why you're considering [Notion](https://notion.so/affiliates/YOURCODE) vs Trello for small business productivity. With so many options available, it can be overwhelming to decide which one is best for your business. In this article, we'll break down the features, pricing, and benefits of Notion and Trello to help you make an informed decision.
 

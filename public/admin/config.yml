@@ -1,6 +1,12 @@
+# public/admin/config.yml
+# Decap CMS (formerly Netlify CMS) — free, open source, no Netlify account needed
+# Access at: https://aitoolsidea.com/admin
+
 backend:
-  name: git-gateway
+  name: github
+  repo: JeevaMatrix/SEO-site        # ← change to your actual GitHub username/repo
   branch: main
+  base_url: https://api.netlify.com  # OAuth via Netlify identity (free)
 
 media_folder: "public/images/blog"
 public_folder: "/images/blog"
@@ -14,12 +20,12 @@ collections:
     extension: "md"
     format: "frontmatter"
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Description", name: "description", widget: "string" }
-      - { label: "Publish Date", name: "pubDate", widget: "datetime", format: "YYYY-MM-DD" }
-      - { label: "Cover Image", name: "image", widget: "image", required: false }
-      - { label: "Tags", name: "tags", widget: "list", default: ["ai tools", "small business"] }
-      - { label: "Affiliate", name: "affiliate", widget: "string", required: false }
-      - { label: "Affiliate URL", name: "affiliateUrl", widget: "string", required: false }
-      - { label: "Draft", name: "draft", widget: "boolean", default: false }
-      - { label: "Body", name: "body", widget: "markdown" }
+      - { label: "Title",        name: "title",       widget: "string" }
+      - { label: "Description",  name: "description", widget: "string" }
+      - { label: "Publish Date", name: "pubDate",     widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Cover Image",  name: "image",       widget: "image",  required: false }
+      - { label: "Tags",         name: "tags",        widget: "list",   default: ["ai tools", "small business"] }
+      - { label: "Affiliate",    name: "affiliate",   widget: "string", required: false }
+      - { label: "Affiliate URL",name: "affiliateUrl",widget: "string", required: false }
+      - { label: "Draft",        name: "draft",       widget: "boolean", default: false }
+      - { label: "Body",         name: "body",        widget: "markdown" }

@@ -2,12 +2,10 @@
 
 backend:
   name: github
-  repo: JeevaMatrix/SEO-site        # ← your exact GitHub username/repo
+  repo: JeevaMatrix/SEO-site    # ← verify this is your exact repo name
   branch: main
-
-# Use Decap's hosted OAuth — no Netlify account needed
-# Registered app at: https://decapcms.org/docs/github-backend/
-  base_url: https://decap-proxy.netlify.app
+  base_url: https://aitoolsidea.com
+  auth_endpoint: api/auth
 
 media_folder: "public/images/blog"
 public_folder: "/images/blog"

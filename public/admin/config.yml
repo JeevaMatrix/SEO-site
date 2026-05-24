@@ -3,7 +3,7 @@
 # Access at: https://aitoolsidea.com/admin
 
 backend:
-  name: git-gateway
+  name: github
   repo: JeevaMatrix/SEO-site        # ← change to your actual GitHub username/repo
   branch: main
   base_url: https://api.netlify.com  # OAuth via Netlify identity (free)

@@ -1,6 +1,6 @@
 ---
 affiliateUrl: https://zapier.com?via=YOURCODE
-draft: true
+draft: false
 amazonProducts: []
 updatedDate: 2026-05-23
 title: zapier alternatives github — Complete Guide [2026]

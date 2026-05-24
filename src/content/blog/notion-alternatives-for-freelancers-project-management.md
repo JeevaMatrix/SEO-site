@@ -1,6 +1,6 @@
 ---
 affiliateUrl: https://notion.so/affiliates/YOURCODE
-draft: true
+draft: false
 amazonProducts: []
 updatedDate: 2026-05-23
 title: notion alternatives for freelancers project management — Complete Guide [2026]

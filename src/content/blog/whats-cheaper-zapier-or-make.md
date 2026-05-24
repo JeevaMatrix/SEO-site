@@ -1,6 +1,6 @@
 ---
 affiliateUrl: https://zapier.com?via=YOURCODE
-draft: true
+draft: false
 amazonProducts: []
 updatedDate: 2026-05-22
 title: what's cheaper, zapier or make — Complete Guide [2026]

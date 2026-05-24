@@ -1,5 +1,5 @@
 ---
-draft: true
+draft: false
 amazonProducts: []
 updatedDate: 2026-05-17
 title: zapier alternatives for small business owners — Complete Guide [2026]

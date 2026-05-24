@@ -1,6 +1,6 @@
 ---
 affiliateUrl: https://notion.so/affiliates/YOURCODE
-draft: true
+draft: false
 amazonProducts: []
 updatedDate: 2026-05-24
 title: notion vs trello for small business productivity — Complete Guide [2026]

@@ -1,16 +1,13 @@
 # public/admin/config.yml
 
 backend:
-  name: git-gateway
-  repo: JeevaMatrix/SEO-site
+  name: github
+  repo: JeevaMatrix/SEO-site        # ← your exact GitHub username/repo
   branch: main
-  base_url: https://api.netlify.com
-  auth_endpoint: auth
-  app_id: Ov23li9z5VKcJVGYntAk
 
 # Use Decap's hosted OAuth — no Netlify account needed
 # Registered app at: https://decapcms.org/docs/github-backend/
-  #base_url: https://decap-proxy.netlify.app
+  base_url: https://decap-proxy.netlify.app
 
 media_folder: "public/images/blog"
 public_folder: "/images/blog"

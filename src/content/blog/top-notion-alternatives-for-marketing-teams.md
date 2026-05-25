@@ -1,10 +1,11 @@
 ---
-affiliateUrl: https://notion.so/affiliates/YOURCODE
+
+affiliateUrl: "https://notion.so/affiliates/YOURCODE"
 draft: false
 amazonProducts: []
 updatedDate: 2026-05-24
-title: Top Notion Alternatives for Marketing Teams — Complete Guide [2026]
-description: Discover the best Notion alternatives for marketing teams to boost
+title: "Top Notion Alternatives for Marketing Teams — Complete Guide [2026]"
+description: "Discover the best Notion alternatives for marketing teams to boost. An in-depth guide to help small business owners choose the right AI tools and automation."
   productivity and collaboration, featuring top tools and pricing as of 2026
 pubDate: 2026-05-24
 image: https://tse1.mm.bing.net/th/id/OIP.l-n6Za2FQ-1w0JdAkIfoPwHaD4?cb=thfc1falcon&rs=1&pid=ImgDetMain&o=7&rm=3

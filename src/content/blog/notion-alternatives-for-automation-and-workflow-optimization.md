@@ -1,11 +1,12 @@
 ---
-affiliateUrl: https://notion.so/affiliates/YOURCODE
+
+affiliateUrl: "https://notion.so/affiliates/YOURCODE"
 draft: false
 amazonProducts: []
 updatedDate: 2026-05-24
-title: Notion Alternatives for Automation and Workflow Optimization — Complete
+title: "Notion Alternatives for Automation and Workflow Optimization — Complete"
   Guide [2026]
-description: Discover the best Notion alternatives for automating workflows and
+description: "Discover the best Notion alternatives for automating workflows and. An in-depth guide to help small business owners choose the right AI tools and automation."
   optimizing productivity in your small business, with expert comparisons and
   pricing.
 pubDate: 2026-05-24

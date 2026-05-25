@@ -1,10 +1,11 @@
 ---
-affiliateUrl: https://notion.so/affiliates/YOURCODE
+
+affiliateUrl: "https://notion.so/affiliates/YOURCODE"
 draft: false
 amazonProducts: []
 updatedDate: 2026-05-23
-title: best notion alternatives for small business owners — Complete Guide [2026]
-description: Discover the best Notion alternatives for small business owners to
+title: "best notion alternatives for small business owners — Complete Guide [2026]"
+description: "Discover the best Notion alternatives for small business owners to. An in-depth guide to help small business owners choose the right AI tools and automation."
   boost productivity and efficiency in 2026
 pubDate: 2026-05-23
 image: https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80

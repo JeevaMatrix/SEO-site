@@ -1,10 +1,11 @@
 ---
+
 affiliateUrl: "#"
 draft: false
 amazonProducts: []
 updatedDate: 2026-05-22
-title: n8n review for business process automation — Complete Guide [2026]
-description: Discover the best business process automation tools, including n8n,
+title: "n8n review for business process automation — Complete Guide [2026]"
+description: "Discover the best business process automation tools, including n8n,. An in-depth guide to help small business owners choose the right AI tools and."
   to streamline your workflow and boost productivity with our expert review and
   comparison.
 pubDate: 2026-05-22

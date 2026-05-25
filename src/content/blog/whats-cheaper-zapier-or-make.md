@@ -1,10 +1,11 @@
 ---
-affiliateUrl: https://zapier.com?via=YOURCODE
+
+affiliateUrl: "https://zapier.com?via=YOURCODE"
 draft: false
 amazonProducts: []
 updatedDate: 2026-05-22
-title: what's cheaper, zapier or make — Complete Guide [2026]
-description: Compare Zapier and Make pricing, features, and pros and cons to
+title: "what's cheaper, zapier or make — Complete Guide [2026]"
+description: "Compare Zapier and Make pricing, features, and pros and cons to. An in-depth guide to help small business owners choose the right AI tools and automation."
   find the best automation tool for your small business, including what's
   cheaper, Zapier or Make
 pubDate: 2026-05-22

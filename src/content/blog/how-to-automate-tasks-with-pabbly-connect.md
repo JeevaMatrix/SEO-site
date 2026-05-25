@@ -2,6 +2,7 @@
 
 
 
+
 title: "How To Automate Tasks With Pabbly Connect"
 description: "A guide to how to automate tasks with pabbly connect. An in-depth guide to help small business owners choose the right AI tools and automation software."
 pubDate: 2026-05-22

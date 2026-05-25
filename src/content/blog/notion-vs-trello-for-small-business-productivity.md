@@ -1,10 +1,11 @@
 ---
-affiliateUrl: https://notion.so/affiliates/YOURCODE
+
+affiliateUrl: "https://notion.so/affiliates/YOURCODE"
 draft: false
 amazonProducts: []
 updatedDate: 2026-05-24
-title: notion vs trello for small business productivity — Complete Guide [2026]
-description: Compare Notion and Trello for small business productivity,
+title: "notion vs trello for small business productivity — Complete Guide [2026]"
+description: "Compare Notion and Trello for small business productivity,. An in-depth guide to help small business owners choose the right AI tools and automation software."
   features, and pricing to boost your team's efficiency
 pubDate: 2026-05-24
 image: https://thf.bing.com/th/id/OIP.rKDHfdRU_JejeymReAjHFgHaE8?w=237&h=180&c=7&r=0&o=7&cb=thfc1falcon&dpr=1.3&pid=1.7&rm=3

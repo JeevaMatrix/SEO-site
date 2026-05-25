@@ -1,10 +1,11 @@
 ---
-affiliateUrl: https://zapier.com?via=YOURCODE
+
+affiliateUrl: "https://zapier.com?via=YOURCODE"
 draft: false
 amazonProducts: []
 updatedDate: 2026-05-23
-title: zapier alternatives github — Complete Guide [2026]
-description: Discover the best Zapier alternatives on GitHub for small business
+title: "zapier alternatives github — Complete Guide [2026]"
+description: "Discover the best Zapier alternatives on GitHub for small business. An in-depth guide to help small business owners choose the right AI tools and automation."
   owners to automate tasks and boost productivity
 pubDate: 2026-05-23
 image: https://thf.bing.com/th/id/OIP.THKK2K7MgPsJtKsPCVK_LQHaDt?w=387&h=175&c=7&r=0&o=7&cb=thfc1falcon&dpr=1.3&pid=1.7&rm=3

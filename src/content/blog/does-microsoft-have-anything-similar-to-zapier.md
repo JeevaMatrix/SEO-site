@@ -1,10 +1,11 @@
 ---
-affiliateUrl: https://zapier.com?via=YOURCODE
+
+affiliateUrl: "https://zapier.com?via=YOURCODE"
 draft: false
 amazonProducts: []
 updatedDate: 2026-05-22
-title: does microsoft have anything similar to zapier — Complete Guide [2026]
-description: Discover if Microsoft offers an alternative to Zapier for
+title: "does microsoft have anything similar to zapier — Complete Guide [2026]"
+description: "Discover if Microsoft offers an alternative to Zapier for. An in-depth guide to help small business owners choose the right AI tools and automation software."
   automating tasks and workflows, and learn about Zapier's features and pricing.
 pubDate: 2026-05-22
 image: https://cdn.pixabay.com/photo/2016/04/27/15/04/office-1356793_1280.png

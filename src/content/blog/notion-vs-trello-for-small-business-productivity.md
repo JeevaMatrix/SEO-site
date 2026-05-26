@@ -1,5 +1,6 @@
 ---
 
+
 affiliateUrl: "https://notion.so/affiliates/YOURCODE"
 draft: false
 amazonProducts: []

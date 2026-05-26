@@ -1,6 +1,7 @@
 ---
 
 
+
 title: "notion vs airtable for small business database management — Complete Guide [2026]"
 description: "Compare Notion and Airtable for small business database management, featuring pricing, features, and support to help you choose the best tool"
 pubDate: 2026-05-25

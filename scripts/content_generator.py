@@ -191,6 +191,7 @@ TYPE_GUIDE = {
     "listicle":    "Start with a quick comparison table. Each item as H3 with: price, best for, one key limitation.",
     "how-to":      "Use numbered steps. Describe what user sees after each step. Add troubleshooting section. State time required.",
     "alternatives":"Compare vs the original tool in a table. Explain why someone switches. Separate free vs paid options.",
+    "income":      "Focus on HOW someone makes real money. Include: step-by-step income setup, realistic earnings ($X/month), required tools with prices, time to first dollar, real use case examples. Add a 'Getting Started This Week' action section.",
 }
 
 def make_prompt(keyword: str, article_type: str, saas_aff: dict | None) -> str:
@@ -208,7 +209,17 @@ Example insertion: [Try {saas_aff['name']} free]({saas_aff['url']})"""
 
     saas_url = saas_aff["url"] if saas_aff else "#"
 
-    return f"""You are a senior tech writer for a site helping small business owners choose AI and automation tools.
+    # Pick a human writing persona based on article type
+    if article_type == "income":
+        persona = "You are a US-based entrepreneur who has actually made money using AI tools. Write from experience — specific numbers, real steps, honest caveats."
+    elif article_type == "how-to":
+        persona = "You are a patient tech teacher explaining to a non-technical small business owner. Use plain English, short sentences, real screenshots described in words."
+    elif article_type == "comparison":
+        persona = "You are a no-nonsense business advisor who has used both tools. Give a clear verdict — no fence-sitting."
+    else:
+        persona = "You are a trusted advisor helping US small business owners cut through marketing fluff and pick the right tools."
+
+    return f"""{ persona }
 
 TARGET KEYWORD: "{keyword}"
 ARTICLE TYPE: {article_type}
@@ -218,14 +229,16 @@ YEAR: {year}
 FORMAT REQUIREMENT: {guide}
 
 WRITING RULES:
-- Sentence 1 must name the reader's exact problem
-- Write for non-technical SMB owners — practical, specific, brutally honest
+- Sentence 1 must name the reader's exact pain or goal — make it feel personal
+- Write like you're talking to one specific person, not a crowd
+- Use "you" throughout — never "businesses" or "users"
 - Include real pricing (use your knowledge, note "as of {year}")
 - 2-3 "Pro tip:" callouts with genuinely useful, non-obvious advice
-- NEVER use: delve, leverage, utilize, embark, game-changer, straightforward, certainly, absolutely, in conclusion, it's worth noting
-- Length: 1600-2200 words. This is critical — articles under 1200 words will be rejected.
+- Use short paragraphs (2-3 sentences max) — this is read on mobile
+- NEVER use: delve, leverage, utilize, embark, game-changer, straightforward, certainly, absolutely, in conclusion, it's worth noting, look no further
+- Length: 1600-2200 words. Articles under 1200 words will be rejected.
 - End with a '## Frequently Asked Questions' section with 4 H3 questions + paragraph answers
-- Leave a placeholder line exactly as: <!--AMAZON_PRODUCTS_HERE--> near the end before FAQs (the system will auto-inject Amazon product recommendations here)
+- Leave a placeholder line exactly as: <!--AMAZON_PRODUCTS_HERE--> near the end before FAQs
 
 RETURN: Only valid Markdown starting with this exact frontmatter:
 
@@ -344,6 +357,23 @@ TOPIC_SEARCH_QUERIES = {
     "chatbot":       "artificial intelligence chat",
     "data":          "data analytics dashboard charts",
     "spreadsheet":   "spreadsheet data analysis laptop",
+    "make money":    "entrepreneur working laptop success",
+    "income":        "entrepreneur working laptop success",
+    "earn":          "entrepreneur working laptop success",
+    "passive":       "entrepreneur working laptop success",
+    "business":      "small business owner laptop office",
+    "startup":       "startup founder working laptop",
+    "agency":        "marketing agency team working",
+    "side hustle":   "person working laptop coffee shop",
+    "notion":        "productivity workspace desk notes",
+    "canva":         "graphic design creative workspace",
+    "shopify":       "ecommerce laptop online store",
+    "real estate":   "real estate agent laptop office",
+    "coach":         "online coach video call laptop",
+    "consultant":    "business consultant meeting laptop",
+    "lawyer":        "professional working laptop office",
+    "accountant":    "accountant finance laptop numbers",
+    "photographer":  "photographer working laptop editing",
     "default":       "productive business workspace laptop",
 }
 
@@ -365,6 +395,15 @@ CURATED_FALLBACKS = {
     "small business owner laptop":          "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
     "data analytics dashboard charts":      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
     "productive business workspace laptop": "https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&q=80",
+    "entrepreneur working laptop success":  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=80",
+    "small business owner laptop office":   "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
+    "startup founder working laptop":       "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=1200&q=80",
+    "marketing agency team working":        "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80",
+    "person working laptop coffee shop":    "https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=1200&q=80",
+    "graphic design creative workspace":    "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80",
+    "ecommerce laptop online store":        "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
+    "online coach video call laptop":       "https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?w=1200&q=80",
+    "productivity workspace desk notes":    "https://images.unsplash.com/photo-1512314889357-e157c22f938d?w=1200&q=80",
 }
 
 def _get_visual_query(topic: str) -> str:
@@ -408,8 +447,8 @@ def get_image(topic: str) -> str:
             )
             results = r.json().get("results", [])
             if results:
-                # Pick deterministically by topic hash so same topic = same image
-                idx = abs(hash(topic)) % len(results)
+                # Use full topic + query for hash — more unique per article
+                idx = abs(hash(topic + visual_query)) % len(results)
                 return results[idx]["urls"]["regular"]
         except Exception:
             pass
@@ -419,13 +458,14 @@ def get_image(topic: str) -> str:
         try:
             r = requests.get(
                 "https://api.pexels.com/v1/search",
-                params={"query": visual_query, "per_page": 3, "orientation": "landscape"},
+                params={"query": visual_query, "per_page": 15, "orientation": "landscape"},
                 headers={"Authorization": PEXELS_KEY},
                 timeout=10,
             )
             photos = r.json().get("photos", [])
             if photos:
-                idx = abs(hash(topic)) % len(photos)
+                # Use full topic string for hash — more unique per article
+                idx = abs(hash(topic + visual_query)) % len(photos)
                 return photos[idx]["src"]["large2x"]
         except Exception:
             pass

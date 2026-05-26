@@ -17,26 +17,18 @@ jobs:
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
     steps:
-      # ─────────────────────────────────────────────
-      # Checkout repository
-      # ─────────────────────────────────────────────
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      # ─────────────────────────────────────────────
-      # Detect changed markdown articles
-      # ─────────────────────────────────────────────
       - name: Detect new articles
         id: detect
         shell: bash
         run: |
           set +e
-
-          NEW=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" -- 'src/content/blog' \
-            | grep '\.md$' \
-            | head -10 || true)
+          NEW=$(git diff --name-only HEAD~1 HEAD -- 'src/content/blog' \
+            | grep '\.md$' | head -10 || true)
 
           if [ -z "$NEW" ]; then
             COUNT=0
@@ -46,71 +38,41 @@ jobs:
           fi
 
           URLS=""
-
           for f in $NEW; do
             [ -z "$f" ] && continue
-
             SLUG=$(basename "$f" .md)
             URLS="$URLS ${SITE_URL}/blog/${SLUG}/"
           done
 
-          {
-            echo "files<<FILEEOF"
-            echo "$NEW"
-            echo "FILEEOF"
-          } >> "$GITHUB_OUTPUT"
-
-          {
-            echo "urls<<URLEOF"
-            echo "$URLS"
-            echo "URLEOF"
-          } >> "$GITHUB_OUTPUT"
-
+          { echo "files<<FILEEOF"; echo "$NEW"; echo "FILEEOF"; } >> "$GITHUB_OUTPUT"
+          { echo "urls<<URLEOF"; echo "$URLS"; echo "URLEOF"; } >> "$GITHUB_OUTPUT"
           echo "count=${COUNT}" >> "$GITHUB_OUTPUT"
-
           echo "Detected ${COUNT} article(s)"
 
-      # ────────────────────────────────────────────
-      # Submit URLs to IndexNow
-      # ────────────────────────────────────────────
       - name: Ping IndexNow
         if: steps.detect.outputs.count > 0
         shell: bash
         run: |
           if [ -z "$INDEXNOW_KEY" ] || [ -z "$SITE_URL" ]; then
-            echo "INDEXNOW_KEY or SITE_URL missing — skipping"
+            echo "Skipping IndexNow — keys not set"
             exit 0
           fi
-
           for URL in ${{ steps.detect.outputs.urls }}; do
             [ -z "$URL" ] && continue
-
             STATUS=$(curl --max-time 15 -s -o /dev/null -w "%{http_code}" \
               "https://api.indexnow.org/indexnow?url=${URL}&key=${INDEXNOW_KEY}&keyLocation=${SITE_URL}/${INDEXNOW_KEY}.txt")
-
             echo "IndexNow: ${STATUS} → ${URL}"
           done
 
-      # ─────────────────────────────────────────────
-      # Optional Google sitemap ping
-      # ─────────────────────────────────────────────
       - name: Ping Google sitemap
         if: steps.detect.outputs.count > 0
         shell: bash
         run: |
-          if [ -z "$SITE_URL" ]; then
-            echo "SITE_URL missing — skipping"
-            exit 0
-          fi
-
+          if [ -z "$SITE_URL" ]; then echo "SITE_URL missing"; exit 0; fi
           STATUS=$(curl --max-time 15 -s -o /dev/null -w "%{http_code}" \
             "https://www.google.com/ping?sitemap=${SITE_URL}/sitemap-index.xml")
-
           echo "Google sitemap ping: ${STATUS}"
 
-      # ─────────────────────────────────────────────
-      # Post article to Telegram channel
-      # ─────────────────────────────────────────────
       - name: Post to Telegram channel
         if: steps.detect.outputs.count > 0
         shell: bash
@@ -121,57 +83,37 @@ jobs:
           fi
 
           FIRST_FILE=$(echo "${{ steps.detect.outputs.files }}" | head -1)
-
-          if [ -z "$FIRST_FILE" ]; then
-            echo "No article file detected"
-            exit 0
-          fi
+          [ -z "$FIRST_FILE" ] && echo "No file" && exit 0
 
           SLUG=$(basename "$FIRST_FILE" .md)
-
-          TITLE=$(grep '^title:' "$FIRST_FILE" 2>/dev/null \
-            | head -1 \
-            | sed 's/^title: "//;s/"$//' \
-            | sed "s/^title: '//;s/'$//")
-
-          DESC=$(grep '^description:' "$FIRST_FILE" 2>/dev/null \
-            | head -1 \
-            | sed 's/^description: "//;s/"$//' \
-            | sed "s/^description: '//;s/'$//")
-
+          TITLE=$(grep '^title:' "$FIRST_FILE" 2>/dev/null | head -1 \
+            | sed 's/^title: "//;s/"$//' | sed "s/^title: '//;s/'$//")
+          DESC=$(grep '^description:' "$FIRST_FILE" 2>/dev/null | head -1 \
+            | sed 's/^description: "//;s/"$//' | sed "s/^description: '//;s/'$//")
           URL="${SITE_URL}/blog/${SLUG}/"
-
           COUNT=${{ steps.detect.outputs.count }}
+          [ "$COUNT" -gt 1 ] && EXTRA=" (+$((COUNT-1)) more today)" || EXTRA=""
 
-          if [ "$COUNT" -gt 1 ]; then
-            EXTRA=" (+$((COUNT-1)) more today)"
-          else
-            EXTRA=""
-          fi
-
-          MESSAGE="📝 *New article${EXTRA}*
-
-          *${TITLE}*
-
-          ${DESC}
-
-          🔗 [Read now](${URL})
-
-          #AITools #SmallBusiness #Automation"
+          # Build message without leading spaces — critical for Telegram Markdown
+          MSG="📝 *New article${EXTRA}*"$'\n\n'
+          MSG="${MSG}*${TITLE}*"$'\n\n'
+          MSG="${MSG}${DESC}"$'\n\n'
+          MSG="${MSG}🔗 [Read now](${URL})"$'\n\n'
+          MSG="${MSG}#AITools #SmallBusiness #Automation"
 
           JSON=$(jq -n \
             --arg chat_id "$TELEGRAM_CHAT_ID" \
-            --arg text "$MESSAGE" \
-            '{
-              chat_id: $chat_id,
-              text: $text,
-              parse_mode: "Markdown",
-              disable_web_page_preview: false
-            }')
+            --arg text "$MSG" \
+            '{chat_id:$chat_id,text:$text,parse_mode:"Markdown",disable_web_page_preview:false}')
 
-          STATUS=$(curl --max-time 15 -s -o /dev/null -w "%{http_code}" \
+          RESPONSE=$(curl --max-time 15 -s \
             -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -H "Content-Type: application/json" \
             -d "$JSON")
 
-          echo "Telegram post: ${STATUS}"
+          STATUS=$(echo "$RESPONSE" | jq -r '.ok')
+          if [ "$STATUS" = "true" ]; then
+            echo "Telegram post: SUCCESS ✓"
+          else
+            echo "Telegram post FAILED: $(echo "$RESPONSE" | jq -r '.description')"
+          fi

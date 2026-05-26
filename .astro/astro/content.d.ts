@@ -152,6 +152,27 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"blog": {
+"best-free-notion-alternatives-for-solo-entrepreneurs.md": {
+	id: "best-free-notion-alternatives-for-solo-entrepreneurs.md";
+  slug: "best-free-notion-alternatives-for-solo-entrepreneurs";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"best-notion-alternatives-for-remote-teams-collaboration.md": {
+	id: "best-notion-alternatives-for-remote-teams-collaboration.md";
+  slug: "best-notion-alternatives-for-remote-teams-collaboration";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"best-notion-alternatives-for-small-business-owners.md": {
+	id: "best-notion-alternatives-for-small-business-owners.md";
+  slug: "best-notion-alternatives-for-small-business-owners";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
 "best-zapier-alternatives-for-freelancers.md": {
 	id: "best-zapier-alternatives-for-freelancers.md";
   slug: "best-zapier-alternatives-for-freelancers";
@@ -162,13 +183,6 @@ declare module 'astro:content' {
 "does-microsoft-have-anything-similar-to-zapier.md": {
 	id: "does-microsoft-have-anything-similar-to-zapier.md";
   slug: "does-microsoft-have-anything-similar-to-zapier";
-  body: string;
-  collection: "blog";
-  data: InferEntrySchema<"blog">
-} & { render(): Render[".md"] };
-"first-post.md": {
-	id: "first-post.md";
-  slug: "first-post";
   body: string;
   collection: "blog";
   data: InferEntrySchema<"blog">
@@ -201,6 +215,69 @@ declare module 'astro:content' {
   collection: "blog";
   data: InferEntrySchema<"blog">
 } & { render(): Render[".md"] };
+"notion-alternatives-for-automation-and-workflow-optimization.md": {
+	id: "notion-alternatives-for-automation-and-workflow-optimization.md";
+  slug: "notion-alternatives-for-automation-and-workflow-optimization";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"notion-alternatives-for-customer-relationship-management.md": {
+	id: "notion-alternatives-for-customer-relationship-management.md";
+  slug: "notion-alternatives-for-customer-relationship-management";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"notion-alternatives-for-e-commerce-business-owners.md": {
+	id: "notion-alternatives-for-e-commerce-business-owners.md";
+  slug: "notion-alternatives-for-e-commerce-business-owners";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"notion-alternatives-for-freelancers-project-management.md": {
+	id: "notion-alternatives-for-freelancers-project-management.md";
+  slug: "notion-alternatives-for-freelancers-project-management";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"notion-alternatives-for-sales-teams-and-crm.md": {
+	id: "notion-alternatives-for-sales-teams-and-crm.md";
+  slug: "notion-alternatives-for-sales-teams-and-crm";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"notion-alternatives-with-ai-for-business-operations.md": {
+	id: "notion-alternatives-with-ai-for-business-operations.md";
+  slug: "notion-alternatives-with-ai-for-business-operations";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"notion-vs-airtable-for-small-business-database-management.md": {
+	id: "notion-vs-airtable-for-small-business-database-management.md";
+  slug: "notion-vs-airtable-for-small-business-database-management";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"notion-vs-trello-for-small-business-productivity.md": {
+	id: "notion-vs-trello-for-small-business-productivity.md";
+  slug: "notion-vs-trello-for-small-business-productivity";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"top-notion-alternatives-for-marketing-teams.md": {
+	id: "top-notion-alternatives-for-marketing-teams.md";
+  slug: "top-notion-alternatives-for-marketing-teams";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
 "whats-cheaper-zapier-or-make.md": {
 	id: "whats-cheaper-zapier-or-make.md";
   slug: "whats-cheaper-zapier-or-make";
@@ -218,6 +295,27 @@ declare module 'astro:content' {
 "zapier-alternatives-for-small-business-owners.md": {
 	id: "zapier-alternatives-for-small-business-owners.md";
   slug: "zapier-alternatives-for-small-business-owners";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"zapier-alternatives-github.md": {
+	id: "zapier-alternatives-github.md";
+  slug: "zapier-alternatives-github";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"zapier-pricing.md": {
+	id: "zapier-pricing.md";
+  slug: "zapier-pricing";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"zapier-vs-make.md": {
+	id: "zapier-vs-make.md";
+  slug: "zapier-vs-make";
   body: string;
   collection: "blog";
   data: InferEntrySchema<"blog">

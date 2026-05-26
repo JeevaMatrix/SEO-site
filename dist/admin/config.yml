@@ -1,0 +1,30 @@
+# public/admin/config.yml
+
+backend:
+  name: github
+  repo: JeevaMatrix/SEO-site    # ← verify this is your exact repo name
+  branch: main
+  base_url: https://aitoolsidea.com
+  auth_endpoint: api/auth
+
+media_folder: "public/images/blog"
+public_folder: "/images/blog"
+
+collections:
+  - name: "blog"
+    label: "Blog Posts"
+    folder: "src/content/blog"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "Title",         name: "title",        widget: "string" }
+      - { label: "Description",   name: "description",  widget: "string" }
+      - { label: "Publish Date",  name: "pubDate",      widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Cover Image",   name: "image",        widget: "image",    required: false }
+      - { label: "Tags",          name: "tags",         widget: "list",     default: ["ai tools", "small business"] }
+      - { label: "Affiliate",     name: "affiliate",    widget: "string",   required: false }
+      - { label: "Affiliate URL", name: "affiliateUrl", widget: "string",   required: false }
+      - { label: "Draft",         name: "draft",        widget: "boolean",  default: false }
+      - { label: "Body",          name: "body",         widget: "markdown" }

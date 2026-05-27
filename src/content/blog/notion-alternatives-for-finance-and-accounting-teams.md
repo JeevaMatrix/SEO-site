@@ -5,19 +5,8 @@ pubDate: 2026-05-27
 tags: ["ai tools", "small business"]
 affiliate: ""
 affiliateUrl: ""
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Logitech MX Keys Wireless Keyboard"
-    price: "₹8,995"
-    url:   "https://www.amazon.in/dp/B08N5LNQCX?tag=jeeva0d-20"
-    cat:   "Office Gear"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+draft: false
+amazonProducts: []
 ---
 ---
 title: "notion alternatives for finance and accounting teams — Complete Guide [2026]"

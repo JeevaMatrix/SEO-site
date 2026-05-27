@@ -1,26 +1,14 @@
 ---
-
 title: "notion vs clickup for small business productivity and automation — Complete Guide [2026]"
 description: "Boost productivity with the right tool: Notion vs ClickUp for small business productivity and automation in 2026"
 pubDate: 2026-05-27
 updatedDate: 2026-05-27
-tags: ["ai tools", "small business", "productivity"]
 image: "https://source.unsplash.com/800x600/?productivity,small,business"
+tags: ["ai tools", "small business", "productivity"]
 affiliate: "ClickUp"
 affiliateUrl: "https://clickup.com?fp_ref=YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Logitech MX Keys Wireless Keyboard"
-    price: "₹8,995"
-    url:   "https://www.amazon.in/dp/B08N5LNQCX?tag=jeeva0d-20"
-    cat:   "Office Gear"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+draft: false
+amazonProducts: []
 ---
 You're struggling to keep your small business organized, and you're wasting too much time on mundane tasks. You want to find a tool that can help you streamline your workflow, automate repetitive tasks, and increase productivity. You've heard of Notion and ClickUp, but you're not sure which one is best for your business.
 

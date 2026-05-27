@@ -1,26 +1,14 @@
 ---
-
 title: "notion alternatives without ai — Complete Guide [2026]"
 description: "Discover the best Notion alternatives without AI for your small business, boosting productivity and organization"
 pubDate: 2026-05-27
 updatedDate: 2026-05-27
-tags: ["ai tools", "small business", "productivity"]
 image: "https://source.unsplash.com/800x600/?productivity,organization,notion"
+tags: ["ai tools", "small business", "productivity"]
 affiliate: "Notion"
 affiliateUrl: "https://notion.so/affiliates/YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Logitech MX Keys Wireless Keyboard"
-    price: "₹8,995"
-    url:   "https://www.amazon.in/dp/B08N5LNQCX?tag=jeeva0d-20"
-    cat:   "Office Gear"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+draft: false
+amazonProducts: []
 ---
 You're tired of feeling overwhelmed by the countless tasks and projects you need to manage for your small business, and you're looking for a tool that can help you stay organized without breaking the bank. You've probably heard of Notion, but you're not sure if it's the right fit for you, or if there are other options out there that might be a better match. As of 2026, Notion is still a popular choice, but you might be wondering if there are other tools that can offer similar functionality without the AI features.
 

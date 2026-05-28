@@ -1,26 +1,14 @@
 ---
-
 title: "notion alternatives open source — Complete Guide [2026]"
 description: "Discover the best open-source Notion alternatives for small business owners, including free and paid options, to boost productivity in 2026"
 pubDate: 2026-05-28
 updatedDate: 2026-05-28
-tags: ["ai tools", "small business", "productivity"]
 image: "https://example.com/notion-alternatives.png"
+tags: ["ai tools", "small business", "productivity"]
 affiliate: "Notion"
 affiliateUrl: "https://notion.so/affiliates/YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Logitech MX Keys Wireless Keyboard"
-    price: "₹8,995"
-    url:   "https://www.amazon.in/dp/B08N5LNQCX?tag=jeeva0d-20"
-    cat:   "Office Gear"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+draft: false
+amazonProducts: []
 ---
 You're struggling to find the perfect tool to organize your small business, and Notion's limitations are starting to frustrate you. You need a flexible and customizable solution that can keep up with your growing business, but you're not sure where to start. As of 2026, Notion offers a free plan, as well as a paid plan starting at $4 per user per month, making it a popular choice among small business owners.
 

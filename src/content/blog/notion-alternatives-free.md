@@ -1,26 +1,14 @@
 ---
-
 title: "notion alternatives free — Complete Guide [2026]"
 description: "Find the best free Notion alternatives for your small business productivity needs"
 pubDate: 2026-05-28
 updatedDate: 2026-05-28
-tags: ["ai tools", "small business", "productivity"]
 image: "https://images.unsplash.com/photo-1512314889357-e157c22f938d?w=1200&q=80"
+tags: ["ai tools", "small business", "productivity"]
 affiliate: "Notion"
 affiliateUrl: "https://notion.so/affiliates/YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Logitech MX Keys Wireless Keyboard"
-    price: "₹8,995"
-    url:   "https://www.amazon.in/dp/B08N5LNQCX?tag=jeeva0d-20"
-    cat:   "Office Gear"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+draft: false
+amazonProducts: []
 ---
 You're struggling to find a project management tool that fits your small business needs, and Notion's pricing is giving you pause. You want to stay organized, but you don't want to break the bank. As of 2026, Notion's personal plan is free, but its team plan starts at $8 per user per month, which can add up quickly.
 

@@ -1,26 +1,14 @@
 ---
-
 title: "best clickup alternatives for freelancers — Complete Guide [2026]"
 description: "Find the best ClickUp alternatives for freelancers to boost productivity and efficiency in 2026"
 pubDate: 2026-05-29
 updatedDate: 2026-05-29
-tags: ["ai tools", "small business", "productivity"]
 image: "placeholder-image.jpg"
+tags: ["ai tools", "small business", "productivity"]
 affiliate: "ClickUp"
 affiliateUrl: "https://clickup.com?fp_ref=YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "The E-Myth Revisited — Michael Gerber"
-    price: "₹499"
-    url:   "https://www.amazon.in/dp/0887307280?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Deep Work — Cal Newport"
-    price: "₹349"
-    url:   "https://www.amazon.in/dp/B07YWMFLHK?tag=jeeva0d-20"
-    cat:   "Book"
+draft: false
+amazonProducts: []
 ---
 As a freelancer, you're constantly juggling multiple projects, clients, and deadlines, which can be overwhelming and affect your productivity. You need a tool that can help you streamline your workflow, stay organized, and deliver high-quality work on time. 
 

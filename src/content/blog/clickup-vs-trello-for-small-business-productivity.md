@@ -1,26 +1,14 @@
 ---
-
 title: "clickup vs trello for small business productivity — Complete Guide [2026]"
 description: "Compare ClickUp and Trello for small business productivity, features, and pricing to boost your workflow"
 pubDate: 2026-05-30
 updatedDate: 2026-05-30
-tags: ["ai tools", "small business", "productivity"]
 image: "https://example.com/productivity-image"
+tags: ["ai tools", "small business", "productivity"]
 affiliate: "ClickUp"
 affiliateUrl: "https://clickup.com?fp_ref=YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Logitech MX Keys Wireless Keyboard"
-    price: "₹8,995"
-    url:   "https://www.amazon.in/dp/B08N5LNQCX?tag=jeeva0d-20"
-    cat:   "Office Gear"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+draft: false
+amazonProducts: []
 ---
 You're struggling to manage your small business's tasks, projects, and workflows, and you're looking for a solution to boost your productivity. As a business owner, you wear many hats, and it's challenging to keep everything organized. You've heard of ClickUp and Trello, but you're not sure which one is the best fit for your needs.
 

@@ -1,26 +1,14 @@
 ---
-
 title: "open source clickup alternatives for developers — Complete Guide [2026]"
 description: "Discover the best open source ClickUp alternatives for developers to boost productivity and streamline workflow, including free and paid options"
 pubDate: 2026-05-30
 updatedDate: 2026-05-30
-tags: ["ai tools", "small business", "productivity"]
 image: "https://source.unsplash.com/1600x900/?productivity,workflow,management"
+tags: ["ai tools", "small business", "productivity"]
 affiliate: "ClickUp"
 affiliateUrl: "https://clickup.com?fp_ref=YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Logitech MX Keys Wireless Keyboard"
-    price: "₹8,995"
-    url:   "https://www.amazon.in/dp/B08N5LNQCX?tag=jeeva0d-20"
-    cat:   "Office Gear"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+draft: false
+amazonProducts: []
 ---
 You're a developer looking for open source alternatives to ClickUp to manage your projects and workflow more efficiently. You want to break free from the limitations of proprietary software and have more control over your tools. As of 2026, you have several options to choose from, each with its own strengths and weaknesses.
 

@@ -1,26 +1,14 @@
 ---
-
 title: "clickup alternatives with ai automation tools — Complete Guide [2026]"
 description: "Discover top ClickUp alternatives with AI automation tools to boost productivity and streamline workflows"
 pubDate: 2026-05-30
 updatedDate: 2026-05-30
-tags: ["ai tools", "small business", "productivity"]
 image: "https://example.com/productivity-image.png"
+tags: ["ai tools", "small business", "productivity"]
 affiliate: "Zapier"
 affiliateUrl: "https://zapier.com?via=YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Deep Work — Cal Newport"
-    price: "₹349"
-    url:   "https://www.amazon.in/dp/B07YWMFLHK?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+draft: false
+amazonProducts: []
 ---
 You're tired of using ClickUp and want to find an alternative that integrates AI automation tools to streamline your workflow and increase productivity. You've tried various project management tools, but none seem to meet your specific needs. You're looking for a tool that can help you automate repetitive tasks, enhance collaboration, and provide valuable insights to drive your business forward.
 

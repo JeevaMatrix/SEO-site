@@ -1,26 +1,14 @@
 ---
-
 title: "google clickup equivalent for business owners — Complete Guide [2026]"
 description: "Find the best Google ClickUp equivalent for your business needs, boost productivity with the right tools"
 pubDate: 2026-05-31
 updatedDate: 2026-05-31
-tags: ["ai tools", "small business", "productivity"]
 image: "https://source.unsplash.com/1600x900/?business-productivity"
+tags: ["ai tools", "small business", "productivity"]
 affiliate: "ClickUp"
 affiliateUrl: "https://clickup.com?fp_ref=YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Logitech MX Keys Wireless Keyboard"
-    price: "₹8,995"
-    url:   "https://www.amazon.in/dp/B08N5LNQCX?tag=jeeva0d-20"
-    cat:   "Office Gear"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+draft: false
+amazonProducts: []
 ---
 As a small business owner, you're tired of juggling multiple tools to manage your tasks, projects, and team. You're looking for a Google ClickUp equivalent that can streamline your workflow, boost productivity, and help you grow your business. You want a tool that's easy to use, customizable, and integrates with your existing apps.
 

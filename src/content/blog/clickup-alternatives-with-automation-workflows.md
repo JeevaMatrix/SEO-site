@@ -1,26 +1,14 @@
 ---
-
 title: "clickup alternatives with automation workflows — Complete Guide [2026]"
 description: "Find the best ClickUp alternatives with automation workflows for your small business, including free and paid options, and learn how to streamline your."
 pubDate: 2026-05-31
 updatedDate: 2026-05-31
-tags: ["ai tools", "small business", "productivity"]
 image: "https://source.unsplash.com/800x600/?productivity,workflow,automation"
+tags: ["ai tools", "small business", "productivity"]
 affiliate: "Zapier"
 affiliateUrl: "https://zapier.com?via=YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Deep Work — Cal Newport"
-    price: "₹349"
-    url:   "https://www.amazon.in/dp/B07YWMFLHK?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+draft: false
+amazonProducts: []
 ---
 You're tired of using ClickUp and want to explore other options that offer automation workflows to streamline your small business operations. You're looking for a tool that can help you automate repetitive tasks, assign tasks to team members, and track progress in real-time. You want to find a ClickUp alternative that integrates with other apps you use, such as Google Drive, Trello, or Slack.
 

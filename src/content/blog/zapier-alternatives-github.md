@@ -10,7 +10,7 @@ affiliateUrl: "https://zapier.com?via=YOURCODE"
 draft: false
 amazonProducts: []
 ---
-As a [small business](/blog/[zapier](/blog/zapier-alternatives-for-small-business-owners)-alternatives-for-small-business-owners) owner, you're likely struggling to find the perfect automation tool to streamline your workflow, and you're considering [zapier alternatives](/blog/zapier-alternatives-for-small-business-owners) on GitHub to help you achieve your goals. With so many options available, it can be overwhelming to decide which one is right for you. In this article, we'll explore the best Zapier alternatives on GitHub, including their features, pricing, and pros and cons.
+As a [small business](/blog/[zapier](/blog/[zapier](/blog/best-zapier-alternatives-for-freelancers)-alternatives-for-small-business-owners)-alternatives-for-small-business-owners) owner, you're likely struggling to find the perfect automation tool to streamline your workflow, and you're considering [zapier alternatives](/blog/zapier-alternatives-for-small-business-owners) on GitHub to help you achieve your goals. With so many options available, it can be overwhelming to decide which one is right for you. In this article, we'll explore the best Zapier alternatives on GitHub, including their features, pricing, and pros and cons.
 
 Zapier is a popular automation tool that allows you to connect different apps and services to [automate tasks](/blog/how-to-automate-tasks-with-pabbly-connect) and workflows. However, it may not be the best fit for every business, especially those on a tight budget or with specific integration requirements. [Try Zapier free](https://zapier.com?via=YOURCODE) to see if it's right for you, but if you're looking for alternatives, keep reading.
 
@@ -36,7 +36,7 @@ Let's take a closer look at some of the free and paid Zapier alternatives on Git
 
 **Free Options:**
 
-* Automator: Automator is a free, open-source automation tool that allows you to create custom workflows with conditional logic and webhooks. It has a user-friendly interface and supports over 100 apps, including popular services like Google Drive and Trello.
+* Automator: Automator is a free, open-source automation tool that allows you to create custom workflows with conditional logic and webhooks. It has a user-friendly interface and supports over 100 apps, including popular services like Google Drive and [trello](/blog/notion-vs-trello-for-small-business-productivity).
 * n8n: n8n is another free, open-source automation tool that offers advanced features like conditional logic and webhooks. It has a large community of users and supports over 200 apps, including GitHub and Slack.
 * Huginn: Huginn is a free, open-source automation tool that allows you to create custom agents and workflows. It has a steep learning curve, but offers advanced features like webhooks and conditional logic.
 
@@ -47,7 +47,7 @@ Let's take a closer look at some of the free and paid Zapier alternatives on Git
 
 Pro tip: When choosing a paid Zapier alternative, consider the cost per task or automation. Some tools, like Zapier, charge per task, while others, like IFTTT Pro, charge a flat monthly fee. Make sure to calculate the total cost of ownership and choose the option that best fits your budget.
 
-Pro tip: Don't forget to evaluate the customer support and community resources available for each tool. A strong community and good support can make a big difference in your success with automation.
+Pro tip: Don't forget to evaluate the [customer support](/blog/best-[clickup](/blog/clickup-alternatives-for-small-business-owners)-alternatives-for-customer-support-teams) and community resources available for each tool. A strong community and good support can make a big difference in your success with automation.
 
 In addition to the tools mentioned above, there are many other Zapier alternatives on GitHub that are worth considering. Some popular options include:
 

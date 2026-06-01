@@ -1,26 +1,14 @@
 ---
-
 title: "clickup alternatives with ai powered project management — Complete Guide [2026]"
 description: "Find the best ClickUp alternatives with AI-powered project management for your small business, boost productivity and efficiency"
 pubDate: 2026-06-01
 updatedDate: 2026-06-01
-tags: ["ai tools", "small business", "productivity"]
 image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=1200&q=80"
+tags: ["ai tools", "small business", "productivity"]
 affiliate: "ClickUp"
 affiliateUrl: "https://clickup.com?fp_ref=YOURCODE"
-amazonProducts:
-  - title: "Deep Work — Cal Newport"
-    price: "₹349"
-    url:   "https://www.amazon.in/dp/B07YWMFLHK?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Logitech MX Keys Wireless Keyboard"
-    price: "₹8,995"
-    url:   "https://www.amazon.in/dp/B08N5LNQCX?tag=jeeva0d-20"
-    cat:   "Office Gear"
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
+draft: false
+amazonProducts: []
 ---
 You're struggling to manage your small business's projects, and you're looking for a more efficient way to stay organized. You've heard of ClickUp, but you're not sure if it's the right tool for you. With so many options available, it can be overwhelming to choose the best project management tool for your needs.
 

@@ -1,26 +1,14 @@
 ---
-
 title: "ClickUp Alternatives for Entrepreneurs and Startups — Complete Guide [2026]"
 description: "Discover the best ClickUp alternatives for entrepreneurs and startups to boost productivity and efficiency"
 pubDate: 2026-06-01
 updatedDate: 2026-06-01
-tags: ["ai tools", "small business", "productivity"]
 image: "https://example.com/productivity-image"
+tags: ["ai tools", "small business", "productivity"]
 affiliate: "ClickUp"
 affiliateUrl: "https://clickup.com?fp_ref=YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Logitech MX Keys Wireless Keyboard"
-    price: "₹8,995"
-    url:   "https://www.amazon.in/dp/B08N5LNQCX?tag=jeeva0d-20"
-    cat:   "Office Gear"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+draft: false
+amazonProducts: []
 ---
 As an entrepreneur or startup founder, you're likely tired of feeling overwhelmed by the numerous tasks and projects you need to manage on a daily basis. You want a tool that can help you streamline your workflow, enhance collaboration, and increase productivity. 
 

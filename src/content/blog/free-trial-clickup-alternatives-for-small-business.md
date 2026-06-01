@@ -1,26 +1,14 @@
 ---
-
 title: "Free Trial ClickUp Alternatives for Small Business — Complete Guide [2026]"
 description: "Discover top free trial ClickUp alternatives for small business to boost productivity and efficiency"
 pubDate: 2026-06-01
 updatedDate: 2026-06-01
-tags: ["ai tools", "small business", "productivity"]
 image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&q=80"
+tags: ["ai tools", "small business", "productivity"]
 affiliate: "ClickUp"
 affiliateUrl: "https://clickup.com?fp_ref=YOURCODE"
-amazonProducts:
-  - title: "Atomic Habits — James Clear"
-    price: "₹399"
-    url:   "https://www.amazon.in/dp/0735211299?tag=jeeva0d-20"
-    cat:   "Book"
-  - title: "Logitech MX Keys Wireless Keyboard"
-    price: "₹8,995"
-    url:   "https://www.amazon.in/dp/B08N5LNQCX?tag=jeeva0d-20"
-    cat:   "Office Gear"
-  - title: "Anker USB-C Hub 7-in-1"
-    price: "₹2,999"
-    url:   "https://www.amazon.in/dp/B07PDHSJ1J?tag=jeeva0d-20"
-    cat:   "Office Gear"
+draft: false
+amazonProducts: []
 ---
 You're tired of juggling multiple tools to manage your small business, and you're looking for a single platform that can streamline your tasks, projects, and team collaboration. You've heard of ClickUp, but you're not sure if it's the right fit for you, or if there are better alternatives out there. 
 
